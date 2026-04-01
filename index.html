@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Islâmico Moçambique</title>
+    <style>
+        /* --- CSS - ESTILOS (Design Mobile-First) --- */
+        :root {
+            --bg-color: #F0F4F8;
+            --primary-color: #2A9D8F;
+            /* Verde Islâmico Moderno */
+            --secondary-color: #264653;
+            /* Azul Escuro Texto */
+            --accent-color: #E9C46A;
+            /* Dourado */
+            --white: #FFFFFF;
+            --correct-color: #2ECC71;
+            --wrong-color: #E74C3C;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--secondary-color);
+            height: 100vh;
+            overflow: hidden;
+            /* Previne scroll na página inteira, controla nas telas */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Container Principal (Simula tela de telemóvel num PC, full no mobile) */
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            /* Largura máxima de phone */
+            height: 100%;
+            background-color: var(--white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilo Geral das Telas */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            /* Escondido por padrão */
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            /* Scroll dentro da tela se necessário */
+        }
+
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Utilitários */
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* --- BOTOES --- */
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            margin-bottom: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--secondary-color);
+            border-radius: 8px;
+        }
+
+        /* --- 1. TELA INICIAL --- */
+        #screen-home {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #logo-placeholder {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        #motivational-quote {
+            font-style: italic;
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+
+        /* --- 2. TELA CATEGORIAS --- */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border: 2px solid #e1e8ed;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .category-card:active {
+            border-color: var(--primary-color);
+            background-color: #fafafa;
+        }
+
+        .cat-info h3 {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .cat-info p {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .cat-icon {
+            font-size: 30px;
+            margin-right: 15px;
+        }
+
+        .progress-circle {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* --- 3. TELA NÍVEIS --- */
+        #level-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 50px;
+        }
+
+        .level-item {
+            background-color: var(--white);
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .level-item.locked {
+            background-color: #e1e8ed;
+            color: #95a5a6;
+            cursor: not-allowed;
+            border: none;
+        }
+
+        .level-item.completed {
+            border-color: var(--correct-color);
+        }
+
+        .level-item.active-level {
+            border-color: var(--accent-color);
+            background-color: #fffdf5;
+        }
+
+        .level-number {
+            font-size: 24px;
+        }
+
+        .level-status {
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .score-badge {
+            font-size: 10px;
+            color: var(--correct-color);
+            margin-top: 2px;
+        }
+
+        /* --- 4. TELA JOGO (QUIZ) --- */
+        #quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        #timer-container {
+            width: 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        #timer-text {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        #timer-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        #timer-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 1s linear;
+        }
+
+        #lives-container {
+            color: var(--wrong-color);
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        #question-counter {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        #question-box {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+        }
+
+        #question-text {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.4;
+            color: var(--secondary-color);
+        }
+
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: var(--white);
+            border: 2px solid #e1e8ed;
+            color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-prefix {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Estados das respostas */
+        .option-btn.correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+        }
+
+        .option-btn.correct .option-prefix {
+            color: white;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-color);
+            border-color: var(--wrong-color);
+            color: white;
+            animation: shake 0.3s;
+        }
+
+        .option-btn.wrong .option-prefix {
+            color: white;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* --- 5. TELA RESULTADO --- */
+        #screen-result {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .success-icon {
+            color: var(--correct-color);
+        }
+
+        .fail-icon {
+            color: var(--wrong-color);
+        }
+
+        #result-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        #result-score-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        #result-score-text b {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        /* --- FEEDBACK VISUAL --- */
+        #feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            80% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+
+        <div id="feedback-overlay"></div>
+
+        <div id="screen-home" class="screen active">
+            <div id="logo-placeholder">🧠</div>
+            <h1>Quiz Islâmico</h1>
+            <p style="margin-bottom: 40px; color: #7f8c8d;">Teste e aprenda</p>
+
+            <button class="btn" style="width: 80%" onclick="navigateTo('screen-categories')">▶️ Começar</button>
+            <button class="btn btn-accent btn-outline" style="width: 80%"
+                onclick="alert('Funcionalidade Brevemente')">📊 Perfil</button>
+            <button class="btn btn-outline" style="width: 80%; margin-top: 20px;"
+                onclick="navigateTo('screen-settings')">⚙️ Definições</button>
+
+            <p id="motivational-quote">"E diz: Senhor meu, aumenta-me em conhecimento." (Al-Qur'an 20:114)---Aahil Adnan
+            </p>
+        </div>
+
+        <div id="screen-categories" class="screen">
+            <button class="btn-back" onclick="navigateTo('screen-home')">⬅️ Voltar</button>
+            <h1 style="margin-top: 40px;">Categorias</h1>
+
+            <div class="category-list" id="category-list-container">
+            </div>
+        </div>
+
+        <div id="screen-levels" class="screen">
+            <button class="btn-back" onclick="navigateTo('screen-categories')">⬅️ Categorias</button>
+            <h1 id="levels-title" style="margin-top: 40px;">Qur'an</h1>
+            <p id="question-counter">Selecione um nível</p>
+
+            <div id="level-grid">
+            </div>
+        </div>
+
+        <div id="screen-quiz" class="screen">
+            <div id="quiz-header">
+                <div id="lives-container">❤️❤️❤️</div>
+                <div id="question-counter-label">Perg. 1/10</div>
+                <div id="timer-container">
+                    <div id="timer-text">30</div>
+                    <div id="timer-bar-bg">
+                        <div id="timer-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="question-box">
+                <p id="question-text">Carregando pergunta...</p>
+            </div>
+
+            <div id="options-container">
+                <button class="option-btn" onclick="checkAnswer(0)"><span class="option-prefix">A</span> <span
+                        class="option-txt">Opção</span></button>
+                <button class="option-btn" onclick="checkAnswer(1)"><span class="option-prefix">B</span> <span
+                        class="option-txt">Opção</span></button>
+                <button class="option-btn" onclick="checkAnswer(2)"><span class="option-prefix">C</span> <span
+                        class="option-txt">Opção</span></button>
+                <button class="option-btn" onclick="checkAnswer(3)"><span class="option-prefix">D</span> <span
+                        class="option-txt">Opção</span></button>
+            </div>
+        </div>
+
+        <div id="screen-result" class="screen">
+            <div id="result-icon">🎉</div>
+            <h1 id="result-title">Nível Concluído!</h1>
+            <p id="result-score-text">Pontuação: <b>80</b> / 100</p>
+            <p id="result-status-msg" style="margin-bottom: 30px;">Parabéns! Desbloqueaste o próximo nível.</p>
+
+            <button id="btn-next-level" class="btn" style="width: 80%" onclick="retryOrNextLevel()">Seguinte ▶️</button>
+            <button class="btn btn-outline" style="width: 80%" onclick="navigateTo('screen-levels')">Sair 🚪</button>
+        </div>
+
+        <div id="screen-settings" class="screen">
+            <button class="btn-back" onclick="navigateTo('screen-home')">⬅️ Voltar</button>
+            <h1 style="margin-top: 40px;">Definições</h1>
+
+            <div style="margin-top: 30px;">
+                <div
+                    style="display: flex; justify-content: space-between; padding: 15px; background: white; border-radius: 10px; margin-bottom: 10px; align-items: center; border: 1px solid #eee;">
+                    <span>Sons Efectos</span>
+                    <input type="checkbox" id="setting-sound" checked
+                        style="width: 25px; height: 25px; accent-color: var(--primary-color);">
+                </div>
+
+                <p style="font-size: 12px; color: #7f8c8d; margin: 20px 0 10px 5px;">Idioma</p>
+                <button class="btn btn-outline" style="width: 100%; justify-content: space-between;">Português (MZ) 🇲🇿
+                    <span>✓</span></button>
+
+                <button class="btn btn-wrong"
+                    style="width: 100%; margin-top: 50px; background-color: #e74c3c22; color: #e74c3c; border: 1px solid #e74c3c;"
+                    onclick="resetProgress()">⚠️ Resetar Todo Progresso</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT - LÓGICA DO APP --- */
+
+        // 📦 13. BASE DE DADOS DO QUIZ (ESBOÇO)
+        // Estrutura organizada para fácil expansão até 500 perguntas
+        // Como replicar: Copie blocos inteiros, mude IDs e textos. 
+        // Garanta que 'correct' seja o índice (0,1,2,3) da resposta certa na array 'answers'.
+        const quizDatabase = {
+            // 1. QUR'AN
+            "cat1": {
+                title: "Qur'an", icon: "📖",
+                levels: {
+
+                    // Nível 1 (Fácil)
+                    l1: [
+                        { q: "Qual é a Surah mais longa do Al-Qur'an?", answers: ["Al-Imran", "Al-Baqarah", "Yasin", "Al-Fatiha"], correct: 1 },
+                        { q: "Quantos capítulos (Surahs) existem no Al-Qur'an?", answers: ["110", "112", "114", "116"], correct: 2 },
+                        { q: "Em que mês o Al-Qur'an começou a ser revelado?", answers: ["Muharram", "Shaban", "Ramadan", "Dhul-Hijjah"], correct: 2 },
+                        // Adicione mais 7 aqui para completar 10... (usando exemplos repetidos para teste rápido)
+                        { q: "Qual é a primeira Surah do Al-Qur'an?", answers: ["Al-Baqarah", "Al-Ikhlas", "Al-Fatiha", "An-Nas"], correct: 2 },
+                        { q: "Qual Surah é conhecida como a 'Mãe do Livro'?", answers: ["Al-Baqarah", "Yasin", "Al-Fatiha", "Al-Kahf"], correct: 2 },
+                        { q: "Quem revelou o Al-Qur'an ao Profeta Muhammad (s.a.w.)?", answers: ["Anjo Mikail", "Anjo Jibril", "Anjo Israfil", "Anjo Azrail"], correct: 1 },
+                        { q: "Qual é a Surah mais curta?", answers: ["Al-Ikhlas", "Al-Asr", "Al-Anas", "Al-Kauthar"], correct: 3 },
+                        { q: "O Al-Qur'an foi revelado durante quantos anos? (aprox.)", answers: ["10 anos", "13 anos", "23 anos", "40 anos"], correct: 2 },
+                        { q: "Qual Surah não começa com 'Bismillah'?", answers: ["Al-Kahf", "At-Tawbah", "Al-Naml", "Al-Fajr"], correct: 1 },
+                        { q: "Onde esta o versículo considerado o mais grandioso (Ayatul Kursi)?", answers: ["Al-Baqarah: 1", "Al-Baqarah: 255", "Al-Baqarah: 286", "Al-Imran: 190"], correct: 1 }
+                    ],
+                    // Nível 2
+                    l2: [
+                        { q: "Qual Surah é frequentemente chamada de 'O Coração do Alcorão?", answers: ["Al-Kahf", "Ya-Sin", "Al-Mulk", "Ar-Rahman"], correct: 1 },
+                        { q: "Qual Surah contém a frase 'Bismillah' duas vezes?", answers: ["Yunus", "Al-Qasas", "Al-Ma'idah", "An-Naml"], correct: 3 },
+                        { q: "Qual é o profeta mais mencionado pelo nome no Alcorão?", answers: ["Musa (Moisés)", "Ibrahim (Abraão)", "Isa (Jesus)", "Muhammad (SAW)"], correct: 0 },
+                        { q: "Quem é a única mulher mencionada diretamente pelo nome no Alcorão?", answers: ["Aisha(RA)", "Maryam (Maria)", "Asiya", "Khadija(RA)"], correct: 1 },
+                        { q: "Qual companheiro (Sahabi) do Profeta Muhammad é o único mencionado pelo nome no Alcorão?", answers: ["Zayd ibn Harithah", "Ali ibn Abi Talib", "Abu Bakr", "Umar ibn al-Khattab"], correct: 0 },
+                        { q: "O que significa literalmente a palavra 'Al-Qur'an' em árabe?", answers: ["O Livro", "A Luz", "A Recitação", "A Orientação"], correct: 2 },
+                        { q: "Em qual caverna o Profeta Muhammad recebeu a primeira revelação?", answers: ["Caverna de Thawr", "Caverna de Hira", "Caverna de Ashab al-Kahf", "Caverna de Uhud"], correct: 1 },
+                        { q: "Qual Surah recebeu o nome de um inseto produtor de mel?", answers: ["Al-Baqarah", "Al-Ankabut", "An-Naml", "An-Nahl"], correct: 3 },
+                        { q: "Qual Surah é equivalente a um terço do Alcorão em termos de recompensa por sua leitura?", answers: ["Al-Kafirun", "Al-Ikhlas", "Al-Falaq", "An-Nass"], correct: 1 },
+                        { q: "Qual tio do Profeta Muhammad é condenado explicitamente pelo nome em uma Surah?", answers: ["Hamza", "Abu Talib", "Abu Lahab", "Abu Jahl"], correct: 2 }
+                    ],
+                    l3: [
+                        { q: "Quantas partes (juz) compõem o Alcorão?", answers: ["20", "30", "25", "28"], correct: 1 },
+                        { q: "Qual é a primeira palavra revelada ao Profeta Muhammad (s.a.w.)?", answers: ["Bismi", "Alhamdu", "Iqra'", "Qul"], correct: 2 },
+                        { q: "Qual Surah é conhecida como 'A Porta do Alcorão' por ser lida no início da oração?", answers: ["Al-Baqarah", "Al-Ikhlas", "Al-Fatiha", "An-Nas"], correct: 2 },
+                        { q: "Em que cidade foi revelada a maior parte das Surahs longas?", answers: ["Meca", "Medina", "Taif", "Jerusalém"], correct: 1 },
+                        { q: "Qual Surah contém o versículo sobre a abolição das alianças com os idólatras?", answers: ["Al-Ma'idah", "At-Tawbah", "Al-Anfal", "Muhammad"], correct: 1 },
+                        { q: "Qual é o nome do anjo responsável por transmitir a revelação ao Profeta?", answers: ["Mikail", "Israfil", "Jibril", "Azrail"], correct: 2 },
+                        { q: "Quantos versículos (ayat) tem a Surah Al-Fatiha?", answers: ["5", "6", "7", "8"], correct: 2 },
+                        { q: "Qual Surah é recomendada para ser lida às sextas-feiras?", answers: ["Al-Kahf", "Ya-Sin", "Al-Mulk", "Ar-Rahman"], correct: 0 },
+                        { q: "Qual Surah começa com a menção do 'Figo' e da 'Oliveira'?", answers: ["At-Tin", "Az-Zaytun", "Ash-Shams", "Al-Layl"], correct: 0 },
+                        { q: "O que significa a palavra 'Surah' linguisticamente?", answers: ["Carta", "Grau/Posição", "Linha", "Recitação"], correct: 1 }
+                    ],
+                    l4: [
+                        { q: "Quantas Surahs foram reveladas em Meca (Makkiyyah)?", answers: ["86", "88", "90", "82"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Tabela Servida'?", answers: ["Al-Ma'idah", "Al-An'am", "Al-A'raf", "Yunus"], correct: 0 },
+                        { q: "Qual é a única Surah cujo nome é o nome de um dos Profetas mencionados no Alcorão?", answers: ["Yunus", "Hud", "Yusuf", "Ibrahim"], correct: 2 },
+                        { q: "Em qual Surah está a história do povo de Ad e Thamud?", answers: ["Hud", "Al-A'raf", "Ash-Shu'ara", "Al-Fajr"], correct: 0 },
+                        { q: "Quantas vezes o nome 'Muhammad' aparece no Alcorão?", answers: ["3", "4", "5", "6"], correct: 1 },
+                        { q: "Qual é o comprimento aproximado do versículo mais longo do Alcorão?", answers: ["1 linha", "1 página", "Mais de 2 páginas", "Meia página"], correct: 2 },
+                        { q: "Qual Surah contém o versículo do trono (Ayat al-Kursi)?", answers: ["Al-Imran", "Al-Baqarah", "An-Nisa", "Al-Anfal"], correct: 1 },
+                        { q: "Qual Surah é conhecida como 'A Luz' e contém versículos sobre a luz de Allah?", answers: ["An-Nur", "Ash-Shams", "Al-Qamar", "Al-Buruj"], correct: 0 },
+                        { q: "Qual é o nome do oitavo mês do calendário islâmico, também nome de uma Surah?", answers: ["Rajab", "Sha'ban", "Ramadan", "Shawwal"], correct: 1 },
+                        { q: "Quantas Surahs começam com as letras isoladas (al-huruf al-muqatta'ah)?", answers: ["29", "27", "25", "31"], correct: 0 }
+                    ],
+                    l5: [
+                        { q: "Em qual Surah está a história do Profeta Yusuf (José) em detalhes?", answers: ["Yusuf", "Al-An'am", "Al-A'raf", "Taha"], correct: 0 },
+                        { q: "Qual é a última Surah revelada (segundo a maioria dos estudiosos)?", answers: ["An-Nasr", "Al-Ma'idah", "At-Tawbah", "Al-Baqarah"], correct: 1 },
+                        { q: "Qual Surah é frequentemente chamada de 'O Escudo' por sua proteção contra o Dajjal?", answers: ["Al-Kahf", "Ya-Sin", "Al-Mulk", "Al-Hashr"], correct: 0 },
+                        { q: "Qual a única Surah cujo nome é o nome de um animal mencionado no Alcorão?", answers: ["Al-Baqarah", "Al-Ankabut", "An-Nahl", "Al-Fil"], correct: 3 },
+                        { q: "Quantos sajdahs (prostrações de recitação) existem no Alcorão?", answers: ["14", "15", "13", "12"], correct: 1 },
+                        { q: "Qual Surah é conhecida como 'A Vaca' e é a mais longa?", answers: ["Al-Imran", "Al-Baqarah", "An-Nisa", "Al-Ma'idah"], correct: 1 },
+                        { q: "Qual Surah contém o versículo que ordena o uso do véu (hijab) para as mulheres?", answers: ["An-Nur", "Al-Ahzab", "Al-Baqarah", "An-Nisa"], correct: 1 },
+                        { q: "Qual é o nome do versículo mais curto do Alcorão?", answers: ["Mudhammatan", "Muddatthir", "Thumma", "Qif"], correct: 0 },
+                        { q: "Em quantos anos o Alcorão foi completamente revelado?", answers: ["20", "22", "23", "25"], correct: 2 },
+                        { q: "Qual Surah é conhecida como 'O Poder' e trata da Noite do Decreto?", answers: ["Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Asr"], correct: 0 }
+                    ],
+                    l6: [
+                        { q: "Qual Surah menciona o episódio do Elefante (Ashab al-Fil)?", answers: ["Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar"], correct: 0 },
+                        { q: "Qual Surah termina com os nomes de dois anjos (Harut e Marut)?", answers: ["Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah"], correct: 0 },
+                        { q: "Quantas Surahs são chamadas de 'Al-Musabbihat' (as que glorificam a Allah)?", answers: ["5", "6", "7", "8"], correct: 2 },
+                        { q: "Qual Surah contém a ordem para o Profeta dizer 'Dize: Ele é Allah, Único'?", answers: ["Al-Ikhlas", "Al-Kafirun", "Al-Falaq", "An-Nas"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Ferro' e menciona o ferro?", answers: ["Al-Hadid", "Al-Fath", "Al-Hujurat", "Al-Mujadila"], correct: 0 },
+                        { q: "Em qual Surah está o versículo sobre a ab-rogação (naskh)?", answers: ["Al-Baqarah: 106", "An-Nahl: 101", "Ar-Ra'd: 39", "Al-Isra: 86"], correct: 0 },
+                        { q: "Qual Surah tem o nome de uma formiga e menciona o diálogo do Profeta Sulayman com ela?", answers: ["An-Naml", "Al-Ankabut", "Al-Baqarah", "Saba"], correct: 0 },
+                        { q: "Qual é a Surah que começa sem a Basmalah?", answers: ["Al-Fatiha", "At-Tawbah", "An-Nas", "Al-Falaq"], correct: 1 },
+                        { q: "Quantos profetas são mencionados pelo nome no Alcorão?", answers: ["25", "20", "30", "28"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'O Acampamento' e trata da Batalha de Al-Ahzab?", answers: ["Al-Ahzab", "Al-Anfal", "Muhammad", "Al-Fath"], correct: 0 }
+                    ],
+                    l7: [
+                        { q: "Qual Surah é chamada de 'O Soberano' e intercederá por quem a recita?", answers: ["Al-Mulk", "Al-Waqi'ah", "Ar-Rahman", "Al-Hashr"], correct: 0 },
+                        { q: "Em qual Surah está o versículo da purificação (ayat al-tathir)?", answers: ["Al-Ahzab: 33", "An-Nur: 30", "Al-Hujurat: 12", "Al-Baqarah: 177"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Vitória' e foi revelada após o Tratado de Hudaybiyyah?", answers: ["Al-Fath", "An-Nasr", "Al-Furqan", "Al-Hadid"], correct: 0 },
+                        { q: "Qual é a única Surah no Alcorão que contém um versículo sobre o riba (usura) na forma mais severa?", answers: ["Al-Baqarah: 278-279", "Al-Imran: 130", "An-Nisa: 161", "Ar-Rum: 39"], correct: 0 },
+                        { q: "Quantas Surahs têm o nome de um mês islâmico?", answers: ["1", "2", "3", "0"], correct: 0 },
+                        { q: "Qual Surah foi revelada para consolar o Profeta durante o boicote social contra os Banu Hashim?", answers: ["Al-Kawthar", "Ad-Duha", "Al-Inshirah", "Al-Ma'un"], correct: 1 },
+                        { q: "Qual Surah começa com a palavra 'Qul' (Dize) e é a última do Alcorão?", answers: ["An-Nas", "Al-Falaq", "Al-Ikhlas", "Al-Kafirun"], correct: 0 },
+                        { q: "Em qual Surah o nome do Profeta Muhammad é mencionado como 'Ahmad'?", answers: ["As-Saff: 6", "Al-Fath: 29", "Muhammad: 2", "Al-Ahzab: 40"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Argumentação' e trata da mulher que discutiu com o Profeta?", answers: ["Al-Mujadila", "Al-Mumtahanah", "At-Tahrim", "Al-Hashr"], correct: 0 },
+                        { q: "Quantas Surahs começam com a palavra 'Alhamdu lillah'?", answers: ["4", "5", "3", "6"], correct: 1 }
+                    ],
+                    l8: [
+                        { q: "Qual Surah contém a história do Profeta Musa e Al-Khidr?", answers: ["Al-Kahf", "Taha", "Al-Qasas", "Maryam"], correct: 0 },
+                        { q: "Em qual Surah está o versículo da espada (ayat as-sayf) que ab-rogou muitos tratados?", answers: ["At-Tawbah: 5", "Al-Baqarah: 190", "Al-Anfal: 39", "Muhammad: 4"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Abelha' e menciona a abelha como exemplo?", answers: ["An-Nahl", "An-Naml", "Al-Ankabut", "Saba"], correct: 0 },
+                        { q: "Quantas Surahs têm o nome de um dos cinco pilares do Islam?", answers: ["2 (Al-Hajj, As-Saffat?)", "1", "3", "0"], correct: 0 },
+                        { q: "Qual Surah contém a ordem para o Profeta casar-se com Zaynab bint Jahsh?", answers: ["Al-Ahzab: 37", "An-Nur: 32", "Al-Baqarah: 221", "An-Nisa: 24"], correct: 0 },
+                        { q: "Qual é o nome do versículo que fala sobre a aliança dos profetas?", answers: ["Al-Ahzab: 7", "Al-Imran: 81", "Al-Baqarah: 124", "Al-Ma'idah: 14"], correct: 1 },
+                        { q: "Em qual Surah está a história dos Companheiros da Caverna (Ashab al-Kahf)?", answers: ["Al-Kahf", "Al-Anbiya", "Maryam", "Taha"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Mesa' e trata de questões de alimentos e jurisprudência?", answers: ["Al-Ma'idah", "Al-An'am", "An-Nahl", "Al-Baqarah"], correct: 0 },
+                        { q: "Quantas vezes a palavra 'Jannah' (Paraíso) aparece no Alcorão?", answers: ["Mais de 100", "Cerca de 50", "Cerca de 80", "Mais de 120"], correct: 0 },
+                        { q: "Qual Surah começa com a descrição do vento e termina com a menção do Monte Sinai?", answers: ["Adh-Dhariyat", "Al-Mursalat", "An-Nazi'at", "Al-Haqqah"], correct: 0 }
+                    ],
+                    l9: [
+                        { q: "Qual Surah é conhecida como 'O Dia do Juízo' e começa com 'Al-Qari'ah'?", answers: ["Al-Qari'ah", "Az-Zalzalah", "Al-Haqqah", "Al-Qiyama"], correct: 0 },
+                        { q: "Em qual Surah está o versículo sobre a proibição do vinho (khamr)?", answers: ["Al-Ma'idah: 90", "Al-Baqarah: 219", "An-Nisa: 43", "Al-Ahzab: 33"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Repartição' por falar sobre a divisão do Zakat?", answers: ["At-Tawbah", "Al-Anfal", "Al-Hashr", "Al-Ma'idah"], correct: 0 },
+                        { q: "Quantas vezes a palavra 'Allah' aparece no Alcorão?", answers: ["Cerca de 2800", "Cerca de 2200", "Cerca de 2600", "Cerca de 3000"], correct: 0 },
+                        { q: "Qual Surah contém a história do Profeta Ayyub (Jó) e sua paciência?", answers: ["Sad", "Al-Anbiya", "Al-Qasas", "Yusuf"], correct: 0 },
+                        { q: "Em qual Surah está o versículo que ordena a guarda da modéstia e o uso do khimar?", answers: ["An-Nur: 31", "Al-Ahzab: 59", "Al-Baqarah: 222", "Al-Ahzab: 33"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'A Aliança' por mencionar o pacto dos crentes?", answers: ["Al-Fath", "Al-Hujurat", "Al-Hashr", "Al-Mumtahanah"], correct: 0 },
+                        { q: "Quantas Surahs têm o nome de um dos eventos da vida do Profeta?", answers: ["3 (Al-Ahzab, Al-Fath, Muhammad)", "2", "4", "1"], correct: 0 },
+                        { q: "Qual Surah menciona o contrato de casamento e o divórcio com detalhes?", answers: ["At-Talaq", "An-Nisa", "Al-Baqarah", "Al-Ahzab"], correct: 0 },
+                        { q: "Em qual Surah está o versículo sobre a criação do homem de barro e do sopro divino?", answers: ["Al-Hijr: 28-29", "Sad: 71-72", "Al-Baqarah: 30", "Al-A'raf: 11"], correct: 0 }
+                    ],
+                    l10: [
+                        { q: "Qual Surah foi revelada durante a noite e é considerada equivalente a um terço do Alcorão?", answers: ["Al-Ikhlas", "Al-Kafirun", "Al-Falaq", "An-Nas"], correct: 0 },
+                        { q: "Em qual Surah está o versículo sobre a alteração dos textos sagrados pelos judeus?", answers: ["Al-Baqarah: 75", "An-Nisa: 46", "Al-Ma'idah: 13", "At-Tawbah: 30"], correct: 1 },
+                        { q: "Qual Surah é conhecida como 'O Conselho' por conter versículos sobre consulta mútua?", answers: ["Ash-Shura", "Al-Mujadila", "Al-Ma'idah", "Al-Hujurat"], correct: 0 },
+                        { q: "Quantas Surahs começam com a invocação 'Ya ayyuha alladhina amanu'?", answers: ["Mais de 10", "9", "7", "12"], correct: 0 },
+                        { q: "Qual Surah menciona o incidente do Ifk (calúnia contra Aisha)?", answers: ["An-Nur: 11", "Al-Ahzab: 12", "Al-Baqarah: 228", "At-Tahrim: 1"], correct: 0 },
+                        { q: "Em qual Surah está a ordem de fazer a oração do medo (salat al-khawf) em tempo de guerra?", answers: ["An-Nisa: 102", "Al-Baqarah: 239", "Al-Ma'idah: 106", "Al-Anfal: 45"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'As Divorciadas' e trata das regras do divórcio?", answers: ["At-Talaq", "Al-Baqarah", "An-Nisa", "Al-Ahzab"], correct: 0 },
+                        { q: "Quantas Surahs têm o nome de um animal não mencionado no plural?", answers: ["5 (Al-Baqarah, An-Nahl, An-Naml, Al-Ankabut, Al-Fil)", "4", "6", "7"], correct: 0 },
+                        { q: "Em qual Surah está o versículo sobre a proibição de matar crianças por medo da pobreza?", answers: ["Al-Isra: 31", "Al-An'am: 151", "At-Takwir: 8", "Al-Baqarah: 195"], correct: 0 },
+                        { q: "Qual Surah é conhecida como 'O Poder' e fala sobre a revelação do Alcorão na Noite do Decreto?", answers: ["Al-Qadr", "Ad-Dukhan", "Al-Baqarah", "Ash-Shu'ara"], correct: 0 }
+                    ]
+                    // Continuar l3, l4... até l10
+                }
+            },
+            // 2. AQIDAH
+            "cat2": {
+                title: "Aqidah", icon: "⚖️",
+                levels: {
+                    l1: [
+                        { q: "Qual é o primeiro pilar da fé (iman)?", answers: ["Acreditar nos anjos", "Acreditar em Allah", "Acreditar nos livros", "Acreditar nos mensageiros"], correct: 1 },
+                        { q: "Quantos são os pilares da fé (arkan al-iman)?", answers: ["Sete", "Cinco", "Seis", "Quatro"], correct: 2 },
+                        { q: "O que significa a palavra 'Allah'?", answers: ["O Criador", "A Divindade Única", "O Senhor dos mundos", "Aquele que merece toda adoração"], correct: 1 },
+                        { q: "Qual é o maior pecado no Islam (shirk)?", answers: ["Praticar magia", "Associar parceiros a Allah", "Matar um inocente", "Abandonar a oração"], correct: 1 },
+                        { q: "Qual é o último dos livros revelados?", answers: ["Torá", "Evangelho", "Alcorão", "Salmo"], correct: 2 },
+                        { q: "Quem foi o último dos mensageiros?", answers: ["Musa (Moisés)", "Muhammad (s.a.w.)", "Isa (Jesus)", "Ibrahim (Abraão)"], correct: 1 },
+                        { q: "O que são os anjos?", answers: ["Criaturas de fogo", "Filhos de Deus", "Seres humanos elevados", "Criaturas de luz"], correct: 3 },
+                        { q: "Qual anjo é responsável pela revelação?", answers: ["Mikail (Miguel)", "Israfil", "Azrail", "Jibril (Gabriel)"], correct: 3 },
+                        { q: "O que é o Qadar?", answers: ["A livre escolha", "A predestinação divina", "O registro das ações", "A vontade humana"], correct: 1 },
+                        { q: "Qual dos seguintes Nomes de Allah significa 'Aquele que perdoa abundantemente'?", answers: ["Al-Aziz", "Al-Jabbar", "Al-Ghafur", "Al-Muntaqim"], correct: 2 }
+                    ],
+                    l2: [
+                        { q: "O que significa 'Iman' linguisticamente?", answers: ["Submissão", "Certificação e confirmação", "Ação benéfica", "Esperança"], correct: 1 },
+                        { q: "Em qual dos seguintes a fé não é completa sem a crença?", answers: ["Nos anjos", "Nos livros", "No Dia do Juízo", "Nos mensageiros"], correct: 2 },
+                        { q: "Qual é o nome do anjo que sopra a Trombeta no Dia da Ressurreição?", answers: ["Mikail", "Jibril", "Malik", "Israfil"], correct: 3 },
+                        { q: "Qual é o nome do anjo da morte?", answers: ["Raqib", "Atid", "Azrail", "Munkar"], correct: 2 },
+                        { q: "Qual é o nome do anjo encarregado dos tesouros da chuva e do sustento?", answers: ["Jibril", "Mikail", "Israfil", "Ridwan"], correct: 1 },
+                        { q: "O que significa 'Al-Akhirah'?", answers: ["O Paraíso", "A vida após a morte", "O Inferno", "A ressurreição"], correct: 1 },
+                        { q: "O que é 'Al-Barzakh'?", answers: ["O primeiro dia do Juízo", "O período entre a morte e a ressurreição", "A ponte sobre o Inferno", "O lugar dos mártires"], correct: 1 },
+                        { q: "Qual é o nome do anjo que questiona os mortos no túmulo?", answers: ["Raqib e Atid", "Malik e Zabaniyah", "Jibril e Mikail", "Munkar e Nakir"], correct: 3 },
+                        { q: "Quantos são os atributos de Allah que devem ser afirmados segundo a maioria dos sunitas?", answers: ["Oito", "Vinte", "Onze", "Sete"], correct: 3 },
+                        { q: "Qual dos seguintes é um atributo de Allah relacionado à Sua vontade?", answers: ["Al-Qudrah", "Al-‘Ilm", "Al-Hayat", "Al-Iradah"], correct: 3 }
+                    ],
+                    l3: [
+                        { q: "O que significa 'Tawhid al-Rububiyyah'?", answers: ["A unicidade da adoração", "A unicidade dos nomes e atributos", "A unicidade da senhoria de Allah", "A unicidade da divindade"], correct: 2 },
+                        { q: "O que significa 'Tawhid al-Uluhiyyah'?", answers: ["A unicidade da senhoria", "A unicidade dos nomes", "A unicidade da adoração", "A unicidade dos atributos"], correct: 2 },
+                        { q: "O que significa 'Tawhid al-Asma' wa al-Sifat'?", answers: ["A unicidade da senhoria", "A unicidade da adoração", "A unicidade da criação", "A unicidade dos nomes e atributos"], correct: 3 },
+                        { q: "Qual é o pecado que Allah não perdoa se a pessoa morrer sem se arrepender?", answers: ["Assassinato", "Falsidade", "Shirk (associação)", "Adultério"], correct: 2 },
+                        { q: "O que é 'Al-Yawm al-Akhir'?", answers: ["O Dia da sexta-feira", "O Último Dia", "O Dia de Arafah", "O Dia do nascimento do Profeta"], correct: 1 },
+                        { q: "Qual é o nome do Paraíso mencionado com mais frequência no Alcorão?", answers: ["Firdaws", "Adn", "Na‘im", "Jannah"], correct: 3 },
+                        { q: "Qual é o nome do Inferno mencionado como o mais severo?", answers: ["Laza", "Hutamah", "Sa‘ir", "Jahannam"], correct: 3 },
+                        { q: "O que é 'Al-Sirat'?", answers: ["O caminho reto", "O balanço das ações", "A ponte sobre o Inferno", "O muro entre o Paraíso e o Inferno"], correct: 2 },
+                        { q: "O que é 'Al-Mizan'?", answers: ["O livro de registros", "A balança que pesará as ações", "A trombeta do juízo", "A intercessão"], correct: 1 },
+                        { q: "Qual dos livros foi revelado a Musa (Moisés)?", answers: ["Salmo (Zabur)", "Evangelho (Injil)", "Alcorão", "Torá (Tawrat)"], correct: 3 }
+                    ],
+                    l4: [
+                        { q: "Qual dos livros foi revelado a Dawud (Davi)?", answers: ["Torá", "Evangelho", "Salmo (Zabur)", "Alcorão"], correct: 2 },
+                        { q: "Qual dos livros foi revelado a 'Isa (Jesus)?", answers: ["Torá", "Salmo", "Alcorão", "Evangelho (Injil)"], correct: 3 },
+                        { q: "Qual é a posição correta sobre a fé dos filhos dos profetas?", answers: ["São todos salvos", "São descrentes até que provem o contrário", "São crentes se seguirem o caminho de seus pais", "São tratados como muçulmanos por padrão"], correct: 2 },
+                        { q: "O que é 'Al-Ba‘th'?", answers: ["A reunião no local do juízo", "A intercessão", "A prestação de contas", "A ressurreição dos corpos"], correct: 3 },
+                        { q: "O que é 'Al-Hashr'?", answers: ["A ressurreição", "A separação entre os justos e os ímpios", "A reunião de todas as criaturas no campo do juízo", "A entrada no Paraíso"], correct: 2 },
+                        { q: "Qual é o significado de 'Al-Qadar' de acordo com a escola sunita?", answers: ["O homem cria suas próprias ações", "Tudo é forçado", "Allah decretou todas as coisas, mas o homem tem livre-arbítrio", "Apenas o bem é decretado"], correct: 2 },
+                        { q: "Qual grupo negou o Qadar (predestinação) nos primeiros séculos?", answers: ["Al-Jabariyyah", "Al-Murji’ah", "Al-Khawarij", "Al-Qadariyyah"], correct: 3 },
+                        { q: "Qual grupo defendeu que o homem é completamente forçado em suas ações?", answers: ["Al-Qadariyyah", "Al-Mu‘tazilah", "Al-Ash‘ariyyah", "Al-Jabariyyah"], correct: 3 },
+                        { q: "Qual é o nome do anjo encarregado do Paraíso?", answers: ["Malik", "Zabaniyah", "Munkar", "Ridwan"], correct: 3 },
+                        { q: "Qual é o nome do anjo guardião do Inferno?", answers: ["Ridwan", "Jibril", "Mikail", "Malik"], correct: 3 }
+                    ],
+                    l5: [
+                        { q: "O que é 'Al-Isra’ wa al-Mi‘raj'?", answers: ["A migração para Medina", "A primeira revelação", "A conquista de Meca", "A viagem noturna e ascensão do Profeta"], correct: 3 },
+                        { q: "Qual é a crença sunita sobre a visão de Allah no Paraíso?", answers: ["Ninguém verá Allah", "Apenas os profetas verão", "Os crentes verão Allah", "Será apenas uma visão espiritual"], correct: 2 },
+                        { q: "Qual é a primeira obrigação sobre os servos de acordo com o hadith de Mu‘adh?", answers: ["Realizar a oração", "Pagar o zakat", "Jejuar no Ramadan", "Testemunhar que não há divindade além de Allah"], correct: 3 },
+                        { q: "O que é 'Al-Karamah' (carisma) dos santos?", answers: ["Poder sobrenatural inerente", "Conhecimento oculto", "Milagres concedidos por Allah aos justos", "Capacidade de prever o futuro"], correct: 2 },
+                        { q: "Qual é a posição sunita sobre os milagres dos profetas?", answers: ["São apenas lendas", "Aconteceram apenas para alguns", "São invenções dos seguidores", "São verdadeiros e provam sua veracidade"], correct: 3 },
+                        { q: "Qual é o nome do anjo que escreve as boas ações?", answers: ["Atid", "Munkar", "Nakir", "Raqib"], correct: 3 },
+                        { q: "Qual é o nome do anjo que escreve as más ações?", answers: ["Raqib", "Malik", "Ridwan", "Atid"], correct: 3 },
+                        { q: "O que significa 'Al-Fitra'?", answers: ["A tradição profética", "A pureza ritual", "A disposição natural para a crença em Allah", "A obrigação religiosa"], correct: 2 },
+                        { q: "Qual é a crença sobre os pecados dos crentes no Islam sunita?", answers: ["Todo pecado leva à descrença", "Os pecados não afetam a fé", "Apenas os pecados menores são perdoados", "Eles podem ser perdoados por arrependimento e pela misericórdia de Allah"], correct: 3 },
+                        { q: "Qual é o significado de 'Ahl al-Sunnah wa al-Jama‘ah'?", answers: ["Os muçulmanos em geral", "Os sufis", "Os literalistas", "Os seguidores do caminho do Profeta e do consenso da comunidade"], correct: 3 }
+                    ],
+                    l6: [
+                        { q: "Qual grupo histórico afirmava que o pecador grave está entre a fé e a descrença?", answers: ["Al-Khawarij", "Al-Murji’ah", "Al-Ash‘ariyyah", "Al-Mu‘tazilah"], correct: 3 },
+                        { q: "Qual grupo afirmava que o pecador grave é um descrente?", answers: ["Al-Mu‘tazilah", "Al-Murji’ah", "Al-Jabariyyah", "Al-Khawarij"], correct: 3 },
+                        { q: "Qual grupo afirmava que as ações não fazem parte da fé, apenas a crença no coração?", answers: ["Al-Khawarij", "Al-Mu‘tazilah", "Al-Salaf", "Al-Murji’ah"], correct: 3 },
+                        { q: "Qual é a posição correta sobre os Companheiros do Profeta?", answers: ["Alguns desviaram-se", "Devemos criticar aqueles que brigaram", "Apenas os primeiros são confiáveis", "Todos são justos e devemos amá-los"], correct: 3 },
+                        { q: "O que é 'Al-Sahifah al-Sahihah' (as folhas verdadeiras) segundo algumas tradições?", answers: ["O Alcorão original", "Os hadiths autênticos", "Os nomes de Allah", "Páginas reveladas a Abraão e Moisés"], correct: 3 },
+                        { q: "Qual é a crença sobre a Torá e o Evangelho atuais?", answers: ["São completamente autênticos", "Apenas o Evangelho foi alterado", "Foram alterados (tahrif)", "Apenas a Torá foi alterada"], correct: 2 },
+                        { q: "O que significa 'Tahrif'?", answers: ["Ab-rogação", "Interpretação alegórica", "Cancelamento", "Alteração ou distorção"], correct: 3 },
+                        { q: "Qual é a crença sobre a intercessão (shafa‘ah) no Dia do Juízo?", answers: ["Não existe", "Apenas para os profetas", "Existe com permissão de Allah", "Apenas para os anjos"], correct: 2 },
+                        { q: "Quem será o primeiro a interceder no Dia do Juízo?", answers: ["Abraão", "Moisés", "Jesus", "O Profeta Muhammad"], correct: 3 },
+                        { q: "Qual é o significado do atributo 'Al-Istiwa’' (Estabelecer-se no Trono)?", answers: ["É uma metáfora para domínio", "Significa ocupar um lugar", "Não se deve afirmar nem negar", "Allah estabeleceu-Se sobre o Trono de forma que Lhe é adequada"], correct: 3 }
+                    ],
+                    l7: [
+                        { q: "Qual é a posição dos salaf sobre os atributos de Allah?", answers: ["Interpretar metaforicamente", "Negar os atributos", "Apenas aceitar os nomes", "Afirmar sem questionar como nem negar (ithbat bila takyif)"], correct: 3 },
+                        { q: "O que é 'Al-Bid‘ah' (inovação) em termos religiosos?", answers: ["Toda nova prática", "Tecnologia moderna", "Introduzir algo na religião que não faz parte dela", "Costumes culturais"], correct: 2 },
+                        { q: "Qual é a regra sobre seguir um madhhab (escola de pensamento) específico?", answers: ["É obrigatório", "É proibido", "Apenas para os estudiosos", "É permitido, mas não obrigatório"], correct: 3 },
+                        { q: "O que é 'Al-Ijma‘' (consenso)?", answers: ["A opinião da maioria", "A decisão do governante", "O parecer do califa", "O consenso dos estudiosos da comunidade sobre uma questão"], correct: 3 },
+                        { q: "O que é 'Al-Qiyas' (analogia)?", answers: ["Opinião pessoal", "Interpretação literal", "Tradição local", "Deduzir uma regra com base em um princípio similar"], correct: 3 },
+                        { q: "Qual é a crença sobre a fé (iman) dos pais do Profeta?", answers: ["Eram descrentes", "Eram muçulmanos", "Não se pode opinar", "A maioria dos sunitas acredita que eles morreram na fitra (estado natural) antes da mensagem"], correct: 3 },
+                        { q: "O que é 'Al-Kufr al-akbar' (grande descrença)?", answers: ["Pecado grave", "Negar um mandamento", "Desobediência", "A descrença que expulsa da religião"], correct: 3 },
+                        { q: "O que é 'Al-Nifaq al-akbar' (grande hipocrisia)?", answers: ["Fingir ser muçulmano", "Praticar atos de fé e desobedecer", "Falar o contrário do que se pensa", "A hipocrisia que consiste em aparentar fé e esconder descrença"], correct: 3 },
+                        { q: "Qual é a posição sobre aquele que não reza por negligência?", answers: ["Torna-se descrente", "A oração não é obrigatória", "Apenas é repreendido", "Não se torna descrente segundo a maioria dos sunitas, mas comete pecado grave"], correct: 3 },
+                        { q: "Qual é o significado do nome de Allah 'Al-Muhaymin'?", answers: ["O Soberano", "O Criador", "O Perfeito", "O Guardião e Protetor"], correct: 3 }
+                    ],
+                    l8: [
+                        { q: "Qual é o significado do nome de Allah 'Al-Qahhar'?", answers: ["O Vitorioso", "O Todo-Poderoso", "O Justiceiro", "O Subjugador"], correct: 3 },
+                        { q: "O que significa 'Al-Sama‘ wa al-sifat al-khabariyyah' (atributos transmitidos)?", answers: ["Atributos racionais", "Atributos derivados por analogia", "Atributos negativos", "Atributos mencionados no Alcorão e na Sunnah"], correct: 3 },
+                        { q: "Qual é a crença sunita sobre o Alcorão ser 'criado' ou 'não criado'?", answers: ["O Alcorão é criado", "As palavras são criadas", "É uma questão de interpretação", "O Alcorão é a palavra de Allah, não criada"], correct: 3 },
+                        { q: "Qual grupo histórico afirmava que o Alcorão é criado?", answers: ["Al-Ash‘ariyyah", "Al-Maturidiyyah", "Ahl al-Hadith", "Al-Mu‘tazilah"], correct: 3 },
+                        { q: "O que é 'Al-Hawd' (a Cisterna) do Profeta?", answers: ["Um rio no Inferno", "O lugar da prestação de contas", "A porta do Paraíso", "Uma cisterna no Paraíso de onde os crentes beberão antes do Juízo"], correct: 3 },
+                        { q: "O que é 'Al-Shafa‘ah al-kubra' (a grande intercessão)?", answers: ["A intercessão pelos pecadores", "A intercessão dos anjos", "A intercessão dos mártires", "A intercessão do Profeta Muhammad para que comece o julgamento"], correct: 3 },
+                        { q: "Qual é a crença sobre o Dajjal (Anticristo)?", answers: ["Já apareceu", "É uma figura simbólica", "Não existe", "Aparecerá antes do fim do mundo"], correct: 3 },
+                        { q: "Quem matará o Dajjal?", answers: ["O Imam Mahdi", "Um anjo", "O Profeta Muhammad", "Isa (Jesus)"], correct: 3 },
+                        { q: "Qual é a crença sobre a descida de Isa (Jesus) no fim dos tempos?", answers: ["Não descerá", "Descerá apenas espiritualmente", "Descerá como um anjo", "Ele descerá, quebrará a cruz e matará o porco"], correct: 3 },
+                        { q: "O que é 'Al-Yawm al-Mazid' (o Dia do Acréscimo)?", answers: ["O dia do Juízo", "O dia da ressurreição", "O dia do Hajj", "O dia no Paraíso em que os crentes verão Allah"], correct: 3 }
+                    ],
+                    l9: [
+                        { q: "Qual é a crença sobre os 'sinais menores' do fim dos tempos?", answers: ["Acontecerão todos de uma vez", "São apenas lendas", "Acontecerão após a descida de Jesus", "Já ocorreram e ainda ocorrem"], correct: 3 },
+                        { q: "Qual é a crença sobre o surgimento do sol no ocidente?", answers: ["É uma metáfora", "Já aconteceu", "Acontecerá após a morte de Jesus", "É um dos grandes sinais, após o qual o arrependimento não será aceito"], correct: 3 },
+                        { q: "O que é 'Al-Ya’juj wa al-Ma’juj' (Gogue e Magogue)?", answers: ["Dois demônios", "Dois anjos", "Dois montes", "Duas tribos que aparecerão perto do fim do mundo"], correct: 3 },
+                        { q: "Qual é a crença sobre o 'Imam Mahdi'?", answers: ["É uma figura lendária", "Já veio", "É Jesus", "Aparecerá antes de Jesus para restaurar a justiça"], correct: 3 },
+                        { q: "O que é 'Al-Tawbah al-nasuh' (arrependimento sincero)?", answers: ["Apenas pedir perdão", "A penitência", "A confissão", "O arrependimento que remove o pecado e não retorna a ele"], correct: 3 },
+                        { q: "Qual é a posição sobre o 'Takfir' (acusar alguém de descrença)?", answers: ["Pode-se takfir por qualquer pecado", "Apenas os estudiosos podem", "É sempre proibido", "Não se deve takfir de um muçulmano a menos que haja prova clara"], correct: 3 },
+                        { q: "O que é 'Al-Istihlal' (tornar lícito o ilícito)?", answers: ["Interpretar textos", "Fazer analogia", "Ignorar a lei", "Considerar proibido como permitido"], correct: 3 },
+                        { q: "Qual é a crença sobre a possibilidade de ver Allah neste mundo?", answers: ["Apenas os profetas viram", "Os santos podem ver", "Todos os crentes veem", "Não é possível"], correct: 3 },
+                        { q: "O que é 'Al-Sama‘ al-bashariyyah' (audição humana) da palavra de Allah?", answers: ["Ouvir a voz de Allah", "Ouvir os anjos", "Ouvir o Profeta", "Ouvir o Alcorão recitado"], correct: 3 },
+                        { q: "Qual é a posição sobre os atributos de Allah que são mencionados em textos ambíguos (mutashabihat)?", answers: ["Interpretar todos literalmente", "Negar todos", "Apenas aceitar os nomes", "Acreditar neles conforme vieram, sem interpretar (tafwid) ou com interpretação adequada (ta’wil) conforme a escola"], correct: 3 }
+                    ],
+                    l10: [
+                        { q: "Qual é a diferença entre a fé (iman) dos muçulmanos e dos anjos?", answers: ["Os anjos não têm fé", "Os humanos têm fé superior", "É igual", "Os anjos têm fé inata sem testes; os humanos têm fé com livre-arbítrio"], correct: 3 },
+                        { q: "O que é 'Al-Bida‘ al-hasana' (inovação boa) de acordo com alguns estudiosos?", answers: ["Toda inovação é má", "Apenas o que é novo", "A tradição cultural", "Inovações que não contradizem a lei, como compilar o Alcorão"], correct: 3 },
+                        { q: "Qual é a crença sobre os pecados dos profetas?", answers: ["São infalíveis em tudo", "Cometem pecados como qualquer pessoa", "Não têm pecados", "Eles são protegidos de cometer pecados graves, e os pequenos são perdoados"], correct: 3 },
+                        { q: "O que é 'Al-Riddah' (apostasia)?", answers: ["Pecado grave", "Negar um mandamento", "Mudar de religião", "Sair do Islam"], correct: 3 },
+                        { q: "Qual é o destino daquele que morre em apostasia?", answers: ["Será julgado apenas por Allah", "Pode ser perdoado", "É como um descrente original", "Estará no Inferno eternamente, se não se arrepender"], correct: 3 },
+                        { q: "O que significa 'Al-Ittihad' (união) e 'Al-Hulul' (encarnação)?", answers: ["Crenças sufis aceitas", "Conceitos filosóficos", "Termos técnicos de Tawhid", "Crenças desviantes que afirmam a união ou encarnação de Allah em criaturas"], correct: 3 },
+                        { q: "Qual é a posição sunita sobre o 'tawassul' (pedir intercessão) por meio do Profeta após sua morte?", answers: ["É proibido", "É shirk", "É permitido sem restrições", "É permitido apenas com as condições corretas"], correct: 3 },
+                        { q: "O que é 'Al-Tabarruk' (buscar bênçãos) através de relíquias?", answers: ["É proibido", "É idolatria", "É recomendado", "É permitido se baseado na Sunnah"], correct: 3 },
+                        { q: "Qual é a crença sobre a 'proteção divina' (al-‘ismah) dos Companheiros?", answers: ["São infalíveis", "Apenas os primeiros quatro são infalíveis", "Apenas os que juraram fidelidade", "Eles não são infalíveis, mas são justos"], correct: 3 },
+                        { q: "Qual é a posição sobre a oração fúnebre (salat al-janazah) para um muçulmano que cometeu pecados graves?", answers: ["Não se deve rezar", "Apenas os familiares rezam", "É proibida", "Reza-se normalmente, pois o pecado não o tira do Islam"], correct: 3 }
+                    ]
+
+                }
+            },
+            // 3. FIQH
+            "cat3": {
+                title: "Fiqh", icon: "🕌",
+                levels: {
+                    l1: [
+                        { q: "Qual é o primeiro pilar do Islão?", answers: ["A Fé (Shahada)", "A Oração (Salah)", "A Caridade (Zakat)", "O Jejum (Sawm)"], correct: 0 },
+                        { q: "Quantas orações obrigatórias (Fard) existem por dia?", answers: ["3", "4", "5", "6"], correct: 2 },
+                        { q: "Em que mês islâmico ocorre o jejum obrigatório?", answers: ["Muharram", "Ramadão", "Shawwal", "Rajab"], correct: 1 },
+                        { q: "Qual é a direcção (Qibla) que os muçulmanos enfrentam na oração?", answers: ["Jerusalém", "Medina", "Oriente", "Meca (Kaaba)"], correct: 3 },
+                        { q: "A purificação básica com água antes da oração chama-se:", answers: ["Wudu", "Ghusl", "Tayammum", "Masah"], correct: 0 },
+                        { q: "O que é o Zakat?", answers: ["Jejum voluntário", "Oração nocturna", "Caridade obrigatória", "Peregrinação menor"], correct: 2 },
+                        { q: "Qual é a primeira oração do dia?", answers: ["Zuhr", "Fajr", "Asr", "Isha"], correct: 1 },
+                        { q: "Onde os muçulmanos realizam os rituais do Hajj?", answers: ["Jerusalém", "Medina", "Damasco", "Meca"], correct: 3 },
+                        { q: "Quantas vezes o Hajj é obrigatório na vida, para quem tem condições?", answers: ["Pelo menos uma vez", "Todos os anos", "A cada cinco anos", "Duas vezes"], correct: 0 },
+                        { q: "Qual acção anula imediatamente o jejum?", answers: ["Dormir de tarde", "Falar alto", "Comer intencionalmente", "Tomar banho"], correct: 2 }
+                    ],
+
+                    l2: [
+                        { q: "Qual destas acções é obrigatória (Fard) no Wudu?", answers: ["Lavar as mãos até aos pulsos", "Lavar o rosto", "Gargarejar a água", "Limpar as orelhas"], correct: 1 },
+                        { q: "O que é o Ghusl?", answers: ["Uma oração especial", "Um tipo de doação", "Um jejum voluntário", "O banho completo de purificação"], correct: 3 },
+                        { q: "Qual é a oração realizada logo após o pôr do sol?", answers: ["Maghrib", "Isha", "Asr", "Fajr"], correct: 0 },
+                        { q: "Quantos Rakaats obrigatórios (Fard) tem a oração de Zuhr?", answers: ["2", "3", "4", "5"], correct: 2 },
+                        { q: "A purificação feita com terra limpa na ausência de água é o:", answers: ["Ghusl", "Tayammum", "Istinja", "Taharah"], correct: 1 },
+                        { q: "Qual oração não tem Ruku nem Sujud (inclinação e prostração)?", answers: ["Oração de Sexta-feira", "Oração do Eid", "Oração Witr", "Oração Fúnebre (Janazah)"], correct: 3 },
+                        { q: "O que quebra ou anula o Wudu?", answers: ["Dormir profundamente deitado", "Comer carne halal", "Mudar de roupa", "Cortar as unhas"], correct: 0 },
+                        { q: "É permitido falar palavras comuns durante a oração (Salah)?", answers: ["Sim, se for rápido", "Apenas para responder a uma saudação", "Não, invalida a oração", "Sim, se esquecer de algo"], correct: 2 },
+                        { q: "Qual Surata do Alcorão deve ser lida em todos os Rakaats da oração?", answers: ["Surah Al-Ikhlas", "Surah Al-Fatihah", "Surah Al-Baqarah", "Surah Yaseen"], correct: 1 },
+                        { q: "O que se diz para iniciar formalmente a oração?", answers: ["Bismillah", "Alhamdulillah", "Subhanallah", "Allahu Akbar (Takbir)"], correct: 3 }
+                    ],
+
+                    l3: [
+                        { q: "A oração congregacional de sexta-feira (Jumu'ah) substitui qual oração?", answers: ["Zuhr", "Asr", "Maghrib", "Fajr"], correct: 0 },
+                        { q: "Qual destes grupos está isento de jejuar no Ramadão?", answers: ["Estudantes em época de exames", "Trabalhadores braçais", "Mulheres grávidas ou a amamentar", "Pessoas com mais de 40 anos"], correct: 2 },
+                        { q: "Qual é a percentagem padrão do Zakat sobre a riqueza acumulada num ano lunar?", answers: ["1.5%", "2.5%", "5.0%", "10.0%"], correct: 1 },
+                        { q: "O que é Sujud al-Sahw?", answers: ["Prostração de agradecimento", "Prostração ao ler um versículo específico", "Prostração por chegar atrasado", "Prostração do esquecimento na oração"], correct: 3 },
+                        { q: "Sobre qual destes bens não é exigido pagar Zakat?", answers: ["Ouro de uso pessoal (acima do Nisab)", "Prata", "Casas alugadas (rendimento)", "A casa onde a própria pessoa habita"], correct: 3 },
+                        { q: "O que acontece se alguém comer por esquecimento durante o jejum?", answers: ["Deve pagar uma multa", "O jejum é anulado imediatamente", "O jejum continua válido", "Deve jejuar dois dias seguidos"], correct: 2 },
+                        { q: "O jejum voluntário mais recomendado profeticamente ocorre em que dias da semana?", answers: ["Sábados e Domingos", "Segundas e Quintas", "Terças e Quartas", "Sextas-feiras"], correct: 1 },
+                        { q: "O que é a Zakat al-Fitr?", answers: ["Caridade dada no mês de Muharram", "Caridade sobre gado", "Caridade obrigatória antes da oração do Eid al-Fitr", "Imposto sobre propriedades rurais"], correct: 2 },
+                        { q: "Se alguém não puder jejuar definitivamente devido a doença crónica, o que deve fazer?", answers: ["Alimentar um necessitado por cada dia perdido (Fidyah)", "Pedir a alguém que jejue por ele", "Pagar o Zakat a dobrar", "Não tem de fazer absolutamente nada"], correct: 0 },
+                        { q: "Na oração em congregação, se o Imam se enganar, o que devem os homens fazer para o alertar?", answers: ["Tossir alto", "Bater palmas", "Bater no chão", "Dizer 'Subhanallah'"], correct: 3 }
+                    ],
+
+                    l4: [
+                        { q: "O estado de consagração e pureza que o peregrino assume para o Hajj e Umrah chama-se:", answers: ["Tawaf", "Ihram", "Sa'i", "Wuquf"], correct: 1 },
+                        { q: "O limite mínimo de riqueza que torna o Zakat obrigatório chama-se:", answers: ["Waqf", "Sadaqah", "Mahr", "Nisab"], correct: 3 },
+                        { q: "Qual tipo de carne é estritamente proibida (Haram) para consumo?", answers: ["Carne de porco", "Carne de camelo", "Carne de coelho", "Carne de cavalo"], correct: 0 },
+                        { q: "Qual é o nome do dote obrigatório dado pelo noivo à noiva no contrato de casamento?", answers: ["Nafaqah", "Walimah", "Mahr", "Talaq"], correct: 2 },
+                        { q: "Caminhar/correr entre as colinas de Safa e Marwa durante o Hajj chama-se:", answers: ["Rami", "Sa'i", "Tawaf", "Talbiyah"], correct: 1 },
+                        { q: "Para que a carne bovina ou caprina seja Halal, o que deve ser feito?", answers: ["Cozinhar bem a carne", "Ser congelada rapidamente", "O animal ser sedado", "O abate ser feito em nome de Allah cortando as veias jugulares"], correct: 3 },
+                        { q: "No comércio islâmico, o termo para usura ou juros, que é estritamente proibido, é:", answers: ["Riba", "Zakat", "Mudarabah", "Musharakah"], correct: 0 },
+                        { q: "Apedrejar os pilares (Jamarat) é um ritual que faz parte de:", answers: ["Umrah", "Casamento", "Hajj", "Eid al-Fitr"], correct: 2 },
+                        { q: "O casamento islâmico (Nikah) exige obrigatoriamente:", answers: ["Uma grande festa com música", "O consentimento mútuo, o Mahr e testemunhas", "Apenas a presença de um Imam", "Troca de alianças de ouro para o homem e a mulher"], correct: 1 },
+                        { q: "O que é considerado Najis (impuro) na jurisprudência islâmica?", answers: ["Lágrimas", "Suor", "Saliva humana", "Sangue fluido e urina"], correct: 3 }
+                    ],
+
+                    l5: [
+                        { q: "No processo de divórcio islâmico, o período de espera prescrito para a mulher chama-se:", answers: ["Iddah", "Khula", "Faskh", "Zihar"], correct: 0 },
+                        { q: "Se um viajante percorre uma distância considerável, é permitido encurtar as orações de 4 Rakaats para 2. Como se chama isso?", answers: ["Jama'", "Sunnah", "Qasr", "Nafl"], correct: 2 },
+                        { q: "É permitido o consumo de álcool em quantidades muito pequenas para uso recreativo ou culinário?", answers: ["Sim, se a comida for cozinhada", "Absolutamente não, qualquer quantidade é Haram", "Sim, em ocasiões festivas", "Sim, se não causar embriaguez"], correct: 1 },
+                        { q: "O que significa o conceito de Waqf no Islão?", answers: ["Divórcio irrevogável", "Oração da madrugada", "Empréstimo com juros", "Doação de propriedade como caridade perpétua"], correct: 3 },
+                        { q: "Em contratos comerciais islâmicos, o termo 'Gharar' refere-se a:", answers: ["Incerteza excessiva, engano ou risco não mensurável", "Lucro partilhado", "Venda a prestações", "Moeda digital"], correct: 0 },
+                        { q: "Na herança islâmica, depois do pagamento de dívidas e testamento, quem tem prioridade absoluta na partilha?", answers: ["O governo", "As mesquitas locais", "Pais, cônjuges e filhos do falecido", "Os irmãos do falecido"], correct: 2 },
+                        { q: "Qual destas águas é considerada 'Mutlaq' e é totalmente válida para o Wudu?", answers: ["Água com sabor a fruta", "Água da chuva, rio ou poço", "Água já usada num Wudu anterior", "Água de rosas"], correct: 1 },
+                        { q: "Qual destas acções NÃO anula o estado de Ihram durante o Hajj?", answers: ["Cortar o cabelo ou unhas", "Usar perfume", "Caçar animais terrestres", "Tomar banho com sabão sem perfume"], correct: 3 },
+                        { q: "Qual é o limite máximo que um muçulmano pode deixar em testamento (Wasiyyah) para caridade ou não-herdeiros?", answers: ["Um terço da sua riqueza total", "Metade da sua riqueza", "Dois terços da riqueza", "A totalidade da riqueza"], correct: 0 },
+                        { q: "O divórcio iniciado pela mulher mediante a devolução do dote (Mahr) é conhecido em Fiqh como:", answers: ["Talaq", "Zihar", "Khula", "Ila"], correct: 2 }
+                    ],
+                    l6: [
+                        { q: "Qual é o tempo mínimo válido para a menstruação (hayd) segundo muitos juristas?", answers: ["1 dia", "3 dias", "5 dias", "7 dias"], correct: 1 },
+                        { q: "Qual destas ações invalida a oração imediatamente?", answers: ["Fechar os olhos", "Desviar ligeiramente o olhar", "Falar intencionalmente", "Mexer os dedos"], correct: 2 },
+                        { q: "Qual é o ruling de rezar sem saber que estava impuro?", answers: ["Válido", "Makruh", "Inválido", "Opcional repetir"], correct: 2 },
+                        { q: "Quantas pessoas são necessárias no mínimo para Jumu'ah (segundo opinião comum)?", answers: ["2", "3", "40", "1"], correct: 2 },
+                        { q: "O que é Mustahabb?", answers: ["Proibido", "Obrigatório", "Recomendado", "Desaconselhado"], correct: 2 },
+                        { q: "Se alguém duvida quantos rakaats fez, o que deve fazer?", answers: ["Ignorar", "Assumir o maior número", "Assumir o menor número", "Parar oração"], correct: 2 },
+                        { q: "Qual é a regra sobre rir alto na oração?", answers: ["Não afeta", "Anula só wudu", "Anula só oração", "Anula oração e wudu"], correct: 3 },
+                        { q: "Qual destas coisas NÃO quebra o jejum?", answers: ["Comer intencionalmente", "Beber água", "Injeção não nutritiva", "Relação íntima"], correct: 2 },
+                        { q: "Qual é o ruling do Adhan?", answers: ["Fard", "Sunnah muakkadah", "Haram", "Makruh"], correct: 1 },
+                        { q: "O que é Istinja?", answers: ["Lavagem após impureza", "Oração", "Jejum", "Caridade"], correct: 0 }
+                    ],
+
+                    l7: [
+                        { q: "Qual destas situações obriga Ghusl?", answers: ["Dormir", "Relação íntima", "Comer", "Rir"], correct: 1 },
+                        { q: "O que é considerado ‘awrah na oração para o homem?", answers: ["Cabeça", "Umbigo até joelho", "Peito", "Pés"], correct: 1 },
+                        { q: "O que invalida o Tayammum?", answers: ["Ver água disponível", "Rezar", "Sentar", "Falar"], correct: 0 },
+                        { q: "Qual destas é condição para validade da Salah?", answers: ["Estar cansado", "Ter intenção (niyyah)", "Usar branco", "Rezar rápido"], correct: 1 },
+                        { q: "Quantas takbirs existem na oração Janazah?", answers: ["2", "3", "4", "5"], correct: 2 },
+                        { q: "Qual é o ruling de atrasar oração deliberadamente?", answers: ["Permitido", "Makruh", "Pecado", "Sunnah"], correct: 2 },
+                        { q: "Qual destes quebra o Wudu?", answers: ["Sorrir", "Comer", "Sair vento", "Olhar"], correct: 2 },
+                        { q: "O que é Sunnah Muakkadah?", answers: ["Opcional fraco", "Recomendado forte", "Proibido", "Fard"], correct: 1 },
+                        { q: "Qual destas não é condição do jejum?", answers: ["Intenção", "Islam", "Comer pouco", "Tempo correto"], correct: 2 },
+                        { q: "Qual oração pode ser combinada em viagem?", answers: ["Fajr + Zuhr", "Zuhr + Asr", "Maghrib + Fajr", "Isha + Fajr"], correct: 1 }
+                    ],
+
+                    l8: [
+                        { q: "O que é Ijma?", answers: ["Analogia", "Consenso dos sábios", "Opinião pessoal", "Lei civil"], correct: 1 },
+                        { q: "Qual destas fontes vem depois do Qur'an?", answers: ["Ijma", "Qiyas", "Sunnah", "Cultura"], correct: 2 },
+                        { q: "O que é Qiyas?", answers: ["Consenso", "Analogia jurídica", "Hadith", "Lei"], correct: 1 },
+                        { q: "Qual é o ruling de vender algo que não possuis?", answers: ["Permitido", "Recomendado", "Proibido", "Makruh"], correct: 2 },
+                        { q: "O que é Riba?", answers: ["Caridade", "Lucro", "Juros proibidos", "Troca"], correct: 2 },
+                        { q: "Qual destas vendas é inválida?", answers: ["Com preço claro", "Com produto definido", "Com incerteza (Gharar)", "Com testemunha"], correct: 2 },
+                        { q: "O que é Fard Kifayah?", answers: ["Obrigação coletiva", "Obrigação individual", "Opcional", "Makruh"], correct: 0 },
+                        { q: "O que acontece se ninguém cumprir Fard Kifayah?", answers: ["Nada", "Todos pecam", "Só líderes pecam", "Anula-se"], correct: 1 },
+                        { q: "Qual destas não é fonte de Fiqh?", answers: ["Qur'an", "Sunnah", "Ijma", "Moda"], correct: 3 },
+                        { q: "O que é Maslahah?", answers: ["Interesse público", "Lei privada", "Venda", "Jejum"], correct: 0 }
+                    ],
+
+                    l9: [
+                        { q: "Qual é o ruling de rezar sem tempo válido?", answers: ["Válido", "Makruh", "Inválido", "Opcional"], correct: 2 },
+                        { q: "Qual destas ações exige Kaffarah no jejum?", answers: ["Dormir", "Comer esquecido", "Relação íntima intencional", "Beber água por erro"], correct: 2 },
+                        { q: "O que é Khula?", answers: ["Divórcio pelo homem", "Divórcio pela mulher com compensação", "Casamento", "Herança"], correct: 1 },
+                        { q: "Qual destas impede herança?", answers: ["Pobreza", "Diferença de religião", "Distância", "Idade"], correct: 1 },
+                        { q: "Qual é o máximo da Wasiyyah?", answers: ["Metade", "Tudo", "Um terço", "Dois terços"], correct: 2 },
+                        { q: "O que é Talaq Raj'i?", answers: ["Divórcio revogável", "Final", "Temporário", "Inválido"], correct: 0 },
+                        { q: "Quantos Talaq completam divórcio final?", answers: ["1", "2", "3", "4"], correct: 2 },
+                        { q: "O que é Iddah?", answers: ["Tempo espera", "Casamento", "Zakat", "Jejum"], correct: 0 },
+                        { q: "Qual destas mulheres não pode casar durante Iddah?", answers: ["Divorciada", "Viúva", "Todas em Iddah", "Nenhuma"], correct: 2 },
+                        { q: "O que é Nafaqah?", answers: ["Dote", "Sustento financeiro", "Herança", "Venda"], correct: 1 }
+                    ],
+
+                    l10: [
+                        { q: "O que é Istihsan?", answers: ["Preferência jurídica", "Qur'an", "Hadith", "Ijma"], correct: 0 },
+                        { q: "O que é Sadd al-Dhara'i?", answers: ["Abrir meios", "Bloquear meios para o mal", "Lei", "Venda"], correct: 1 },
+                        { q: "O que é Urf?", answers: ["Costume reconhecido", "Lei divina", "Hadith", "Ijma"], correct: 0 },
+                        { q: "O que é Darura?", answers: ["Necessidade extrema", "Luxo", "Venda", "Jejum"], correct: 0 },
+                        { q: "O que é Istishab?", answers: ["Presunção de continuidade", "Analogia", "Ijma", "Venda"], correct: 0 },
+                        { q: "O que é Taklif?", answers: ["Responsabilidade legal", "Venda", "Jejum", "Caridade"], correct: 0 },
+                        { q: "Quem é Mukallaf?", answers: ["Criança", "Responsável legalmente", "Doente", "Viajante"], correct: 1 },
+                        { q: "O que é Hukm Taklifi?", answers: ["Lei prática", "História", "Cultura", "Venda"], correct: 0 },
+                        { q: "Quantas categorias no Hukm Taklifi?", answers: ["3", "4", "5", "6"], correct: 2 },
+                        { q: "Qual destas é categoria de Hukm?", answers: ["Fard", "Cidade", "Idioma", "Cor"], correct: 0 }
+                    ]
+
+                }
+            },
+            // 4. SIRAH
+            "cat4": {
+                title: "Sirah", icon: "🐫",
+                levels: {
+                    l1: [
+                        { q: "Em que cidade nasceu o Profeta Muhammad (s.a.w.)?", answers: ["Medina", "Meca", "Taif", "Jerusalém"], correct: 1 },
+                        { q: "Qual era a profissão do Profeta antes da revelação?", answers: ["Pastor e comerciante", "Médico", "Ferreiro", "Agricultor"], correct: 0 },
+                        { q: "Como se chamava o pai do Profeta?", answers: ["Abu Talib", "Abdul Muttalib", "Abdullah", "Hamza"], correct: 2 },
+                        { q: "Quem foi a primeira esposa do Profeta?", answers: ["Aisha", "Khadija", "Sawda", "Hafsa"], correct: 1 },
+                        { q: "A migração de Meca para Medina é conhecida como:", answers: ["Hajj", "Hijrah", "Isra", "Mi'raj"], correct: 1 },
+                        { q: "Qual era o apelido do Profeta devido à sua honestidade?", answers: ["Al-Amin", "Al-Sadiq", "Al-Karim", "Al-Rauf"], correct: 0 },
+                        { q: "Quem cuidou do Profeta após a morte de sua mãe e avô?", answers: ["Abu Lahab", "Abu Talib", "Al-Abbas", "Hamza"], correct: 1 },
+                        { q: "Em que caverna o Profeta recebeu a primeira revelação?", answers: ["Thawr", "Hira", "Uhud", "Nur"], correct: 1 },
+                        { q: "Qual o nome da mãe do Profeta?", answers: ["Halimah", "Aminah", "Fatimah", "Safiyyah"], correct: 1 },
+                        { q: "Quem foi o primeiro homem a aceitar o Islam?", answers: ["Umar", "Uthman", "Ali", "Abu Bakr"], correct: 3 }
+                    ],
+                    l2: [
+                        { q: "Quantos anos tinha o Profeta quando recebeu a primeira revelação?", answers: ["40", "35", "45", "50"], correct: 0 },
+                        { q: "Qual o nome da ama de leite que cuidou do Profeta na infância?", answers: ["Halimah al-Sa'diyah", "Barakah (Umm Ayman)", "Safiyyah", "Aminah"], correct: 0 },
+                        { q: "Qual foi o primeiro lugar onde o Profeta pregou publicamente o Islam?", answers: ["Monte Safa", "Casa de Arqam", "Pátio da Kaaba", "Monte Marwa"], correct: 0 },
+                        { q: "Quem foi o primeiro mártir do Islam?", answers: ["Sumayyah bint Khayyat", "Bilal ibn Rabah", "Yasir ibn Amir", "Ammar ibn Yasir"], correct: 0 },
+                        { q: "Qual o nome da tribo à qual o Profeta pertencia?", answers: ["Banu Hashim", "Banu Umayyah", "Banu Makhzum", "Banu Zuhrah"], correct: 0 },
+                        { q: "Em que ano ocorreu a Hégira (Hijrah)?", answers: ["622 d.C.", "610 d.C.", "632 d.C.", "624 d.C."], correct: 0 },
+                        { q: "Qual foi a primeira mesquita construída pelo Profeta em Medina?", answers: ["Mesquita do Profeta (Masjid al-Nabawi)", "Masjid Quba", "Masjid al-Qiblatayn", "Masjid al-Aqsa"], correct: 1 },
+                        { q: "Quem foi o companheiro que acompanhou o Profeta na migração para Medina?", answers: ["Ali ibn Abi Talib", "Abu Bakr al-Siddiq", "Umar ibn al-Khattab", "Zayd ibn Harithah"], correct: 1 },
+                        { q: "Qual o nome do contrato que estabeleceu os direitos e deveres entre os muçulmanos e os judeus de Medina?", answers: ["Constituição de Medina", "Tratado de Hudaybiyyah", "Pacto de Aqaba", "Carta de Medina"], correct: 0 },
+                        { q: "Qual foi a primeira batalha travada pelos muçulmanos contra os coraixitas?", answers: ["Uhud", "Badr", "Khandaq", "Mu'tah"], correct: 1 }
+                    ],
+                    l3: [
+                        { q: "Quantos muçulmanos participaram da Batalha de Badr?", answers: ["313", "1000", "700", "500"], correct: 0 },
+                        { q: "Qual é o nome do tio do Profeta que o protegeu, mas morreu como incrédulo?", answers: ["Abu Talib", "Hamza", "Al-Abbas", "Abu Lahab"], correct: 0 },
+                        { q: "Quem foi o grande companheiro conhecido como 'Leão de Allah' e morreu na Batalha de Uhud?", answers: ["Hamza ibn Abd al-Muttalib", "Ali ibn Abi Talib", "Umar ibn al-Khattab", "Mus'ab ibn Umayr"], correct: 0 },
+                        { q: "Em que ano ocorreu a Batalha de Uhud?", answers: ["3 AH", "2 AH", "5 AH", "1 AH"], correct: 0 },
+                        { q: "Qual o nome do judeu que tentou assassinar o Profeta com uma pedra em Medina?", answers: ["Ka'b ibn al-Ashraf", "Sallam ibn Abi al-Huqayq", "Huyayy ibn Akhtab", "Abu Rafi"], correct: 0 },
+                        { q: "Qual foi o tratado que impediu os muçulmanos de realizar a 'umrah em 6 AH?", answers: ["Tratado de Hudaybiyyah", "Pacto de Aqaba", "Constituição de Medina", "Tratado de Najran"], correct: 0 },
+                        { q: "Quem foi o governador do Império Persa que recebeu a carta do Profeta convidando-o ao Islam?", answers: ["Khosrow II (Parviz)", "Heráclio", "Al-Muqawqis", "Negus (Najashi)"], correct: 0 },
+                        { q: "Qual o nome do rei da Abissínia que acolheu os muçulmanos que migraram para lá?", answers: ["Negus (Ashamah)", "Al-Muqawqis", "Heráclio", "Khosrow II"], correct: 0 },
+                        { q: "Em que ano ocorreu a conquista de Meca (Fath Makkah)?", answers: ["8 AH", "7 AH", "9 AH", "10 AH"], correct: 0 },
+                        { q: "Qual foi o último sermão do Profeta durante o Hajj?", answers: ["Sermão de despedida", "Sermão da montanha", "Sermão da justiça", "Sermão da luz"], correct: 0 }
+                    ],
+                    l4: [
+                        { q: "Quantas esposas o Profeta teve durante sua vida (considerando as que ele desposou)?", answers: ["11", "9", "13", "7"], correct: 0 },
+                        { q: "Qual das esposas do Profeta era filha de Abu Bakr al-Siddiq?", answers: ["Aisha", "Hafsa", "Umm Salama", "Sawda"], correct: 0 },
+                        { q: "Qual dos netos do Profeta foi martirizado em Karbala?", answers: ["Husayn", "Hasan", "Abdullah ibn Abbas", "Ali Zayn al-Abidin"], correct: 0 },
+                        { q: "Quem foi o companheiro conhecido como 'o tradutor do Alcorão'?", answers: ["Abdullah ibn Abbas", "Abdullah ibn Mas'ud", "Zayd ibn Thabit", "Ubayy ibn Ka'b"], correct: 0 },
+                        { q: "Qual o nome do escravo etíope que foi o primeiro muezim do Islam?", answers: ["Bilal ibn Rabah", "Zayd ibn Harithah", "Salman al-Farisi", "Ammar ibn Yasir"], correct: 0 },
+                        { q: "Em que batalha o Profeta usou a estratégia do fosso (trincheira)?", answers: ["Khandaq (Trincheira)", "Badr", "Uhud", "Hunayn"], correct: 0 },
+                        { q: "Qual o nome do comandante muçulmano que liderou a expedição a Mu'tah e morreu nela?", answers: ["Zayd ibn Harithah", "Ja'far ibn Abi Talib", "Abdullah ibn Rawahah", "Khalid ibn al-Walid"], correct: 0 },
+                        { q: "Em que ano o Profeta realizou o Hajj de despedida?", answers: ["10 AH", "9 AH", "8 AH", "11 AH"], correct: 0 },
+                        { q: "Qual foi o último versículo revelado ao Profeta?", answers: ["Surah Al-Ma'idah (5:3)", "Surah Al-Baqarah (2:281)", "Surah An-Nasr (110)", "Surah Al-Isra (17)"], correct: 0 },
+                        { q: "Quantos anos o Profeta viveu?", answers: ["63", "60", "65", "70"], correct: 0 }
+                    ],
+                    l5: [
+                        { q: "Qual o nome da filha do Profeta que se casou com Ali ibn Abi Talib?", answers: ["Fatimah", "Zainab", "Ruqayyah", "Umm Kulthum"], correct: 0 },
+                        { q: "Quem foi o companheiro que propôs a ideia do fosso na Batalha de Khandaq?", answers: ["Salman al-Farisi", "Hudhayfah ibn al-Yaman", "Al-Bara' ibn Malik", "Sa'd ibn Mu'adh"], correct: 0 },
+                        { q: "Qual batalha aconteceu no ano 9 AH e foi a última grande batalha liderada pelo Profeta?", answers: ["Tabuk", "Hunayn", "Khaybar", "Mu'tah"], correct: 0 },
+                        { q: "Qual o nome do líder da tribo de Aws que morreu devido aos ferimentos na Batalha de Khandaq?", answers: ["Sa'd ibn Mu'adh", "Usayd ibn Hudayr", "Abu Dujana", "Anas ibn al-Nadr"], correct: 0 },
+                        { q: "Quem foi o escriba principal do Profeta que compilou o Alcorão na época de Abu Bakr?", answers: ["Zayd ibn Thabit", "Ali ibn Abi Talib", "Uthman ibn Affan", "Ubayy ibn Ka'b"], correct: 0 },
+                        { q: "Qual o nome da judia que tentou envenenar o Profeta após a conquista de Khaybar?", answers: ["Zaynab bint al-Harith", "Safiyyah bint Huyayy", "Rayhanah bint Zayd", "Asma bint Marwan"], correct: 0 },
+                        { q: "Qual o nome da batalha em que os muçulmanos sofreram uma derrota inicial devido a arqueiros que desobedeceram?", answers: ["Uhud", "Badr", "Khandaq", "Hunayn"], correct: 0 },
+                        { q: "Quem foi o companheiro conhecido como 'o muezim do Profeta' além de Bilal?", answers: ["Abdullah ibn Umm Maktum", "Abu Mahdhurah", "Sa'd al-Qaraz", "Amir ibn Fuhayrah"], correct: 0 },
+                        { q: "Quantos anos tinha Aisha quando se casou com o Profeta (de acordo com a maioria das fontes)?", answers: ["6 anos (noivado) e 9 (consumação)", "9 anos", "10 anos", "7 anos"], correct: 0 },
+                        { q: "Qual o nome do primo do Profeta que foi um grande erudito e governador de Basra?", answers: ["Abdullah ibn Abbas", "Abdullah ibn Ja'far", "Ali ibn Abi Talib", "Abdullah ibn al-Zubayr"], correct: 0 }
+                    ],
+                    l6: [
+                        { q: "Em que ano ocorreu o 'Ano da Tristeza' ('Aam al-Huzn) no qual o Profeta perdeu Khadija e Abu Talib?", answers: ["10 BH (antes da Hégira)", "8 BH", "3 BH", "1 BH"], correct: 0 },
+                        { q: "Qual o nome do líder dos coraixitas na Batalha de Badr que foi capturado?", answers: ["Abu Jahl", "Utbah ibn Rabi'ah", "Umayyah ibn Khalaf", "Al-Walid ibn Utbah"], correct: 0 },
+                        { q: "Quem foi o companheiro que deu a ideia de escrever o tratado de Hudaybiyyah?", answers: ["Ali ibn Abi Talib", "Umar ibn al-Khattab", "Abu Bakr", "Uthman ibn Affan"], correct: 0 },
+                        { q: "Qual o nome do companheiro que foi enviado como embaixador a al-Muqawqis, governador do Egito?", answers: ["Hatib ibn Abi Balta'ah", "Amr ibn al-As", "Dihyah al-Kalbi", "Abdullah ibn Hudhafah"], correct: 0 },
+                        { q: "Em que local ocorreu o primeiro compromisso de Aqaba (Bay'at al-Aqaba) que levou à migração para Medina?", answers: ["Meca, no vale de Mina", "Medina, na casa de As'ad ibn Zurarah", "Taif", "Monte Arafat"], correct: 0 },
+                        { q: "Qual foi o nome da tribo judaica que foi expulsa de Medina após a Batalha de Badr por conspiração?", answers: ["Banu Qaynuqa'", "Banu Nadir", "Banu Qurayzah", "Banu Harith"], correct: 0 },
+                        { q: "Quem foi o líder da tribo Banu Qurayzah que traiu os muçulmanos na Batalha de Khandaq?", answers: ["Ka'b ibn Asad", "Huyayy ibn Akhtab", "Sallam ibn Abi al-Huqayq", "Abu Rafi"], correct: 0 },
+                        { q: "Qual era o nome do cavalo do Profeta?", answers: ["Sakb", "Murtajiz", "Lizaz", "Al-Jiyad"], correct: 0 },
+                        { q: "Quantas vezes o Profeta realizou a peregrinação (Hajj) após a Hégira?", answers: ["1", "2", "3", "4"], correct: 0 },
+                        { q: "Qual o nome da mula que o Profeta montava?", answers: ["Duldul", "Ya'foor", "Al-Qaswa", "Uthayb"], correct: 0 }
+                    ],
+                    l7: [
+                        { q: "Quem foi o companheiro conhecido como 'o detentor dos dois selos' porque matou Musaylimah, o impostor?", answers: ["Wahshi ibn Harb", "Zayd ibn al-Khattab", "Abu Dujana", "Al-Bara' ibn Malik"], correct: 0 },
+                        { q: "Qual o nome do poeta que satirizava o Profeta e foi morto por ordem dele?", answers: ["Ka'b ibn al-Ashraf", "Abu 'Afak", "Asma bint Marwan", "Al-Nadr ibn al-Harith"], correct: 0 },
+                        { q: "Em que ano ocorreu a Batalha de Khaybar, a conquista do oásis judaico?", answers: ["7 AH", "6 AH", "8 AH", "5 AH"], correct: 0 },
+                        { q: "Quem foi o companheiro que matou Abu Jahl na Batalha de Badr?", answers: ["Mu'adh ibn Amr e Mu'awwidh ibn Afra", "Ali ibn Abi Talib", "Hamza ibn Abd al-Muttalib", "Abu Dujana"], correct: 0 },
+                        { q: "Qual era o nome da espada do Profeta?", answers: ["Dhu al-Fiqar", "Al-Battar", "Al-Mikhdham", "Al-Rasub"], correct: 0 },
+                        { q: "Qual dos seguintes não foi um dos 'dez prometidos ao Paraíso' (al-‘asharah al-mubashsharah)?", answers: ["Khalid ibn al-Walid", "Abu Bakr", "Umar", "Uthman"], correct: 0 },
+                        { q: "Quem foi o primeiro governador muçulmano do Egito?", answers: ["Amr ibn al-As", "Abdullah ibn Sa'd", "Miqdad ibn Aswad", "Abu Musa al-Ash'ari"], correct: 0 },
+                        { q: "Qual o nome da batalha em que Khalid ibn al-Walid recebeu o título de 'Espada de Allah'?", answers: ["Mu'tah", "Hunayn", "Yarmouk (depois do Profeta)", "Tabuk"], correct: 0 },
+                        { q: "Quantos filhos homens o Profeta teve com Khadija?", answers: ["3 (Qasim, Abdullah, Ibrahim)", "2", "4", "1"], correct: 0 },
+                        { q: "Qual o nome da escrava que cuidou do Profeta após a morte de sua mãe?", answers: ["Umm Ayman (Barakah)", "Halimah al-Sa'diyah", "Safiyyah", "Fatimah"], correct: 0 }
+                    ],
+                    l8: [
+                        { q: "Quem foi o companheiro que se disfarçou de espião na Batalha de Khandaq para trazer informações?", answers: ["Hudhayfah ibn al-Yaman", "Salman al-Farisi", "Nu'aym ibn Mas'ud", "Amr ibn al-As"], correct: 0 },
+                        { q: "Qual era o nome do camelo do Profeta na Hégira?", answers: ["Al-Qaswa", "Al-Adba'", "Al-Jad'aa", "Al-Khattaf"], correct: 0 },
+                        { q: "Em que ano o Profeta enviou cartas aos reis e governantes convidando-os ao Islam?", answers: ["6 AH", "5 AH", "7 AH", "8 AH"], correct: 0 },
+                        { q: "Qual o nome do companheiro que traduziu as cartas do Profeta para outras línguas?", answers: ["Zayd ibn Thabit", "Abdullah ibn Abbas", "Khalid ibn Sa'id", "Uthman ibn Affan"], correct: 0 },
+                        { q: "Quem foi o rei de Ghassan que matou o enviado do Profeta (al-Harith ibn Umayr) e desencadeou a expedição de Mu'tah?", answers: ["Shurahbil ibn Amr", "Al-Harith ibn Abi Shamir", "Jabalah ibn al-Ayham", "Al-Mundhir ibn al-Harith"], correct: 0 },
+                        { q: "Qual batalha foi travada após a conquista de Meca contra as tribos de Hawazin e Thaqif?", answers: ["Hunayn", "Ta'if", "Autas", "Nakhla"], correct: 0 },
+                        { q: "Em que mesquita o Profeta realizou a oração do eclipse solar (kusuf) quando seu filho Ibrahim faleceu?", answers: ["Masjid al-Nabawi", "Masjid Quba", "Sua casa", "Masjid al-Qiblatayn"], correct: 0 },
+                        { q: "Quantos anos durou o boicote econômico e social contra o Profeta e os Banu Hashim?", answers: ["3 anos", "2 anos", "4 anos", "5 anos"], correct: 0 },
+                        { q: "Qual o nome do homem que ofereceu proteção ao Profeta quando ele foi a Taif e foi rejeitado?", answers: ["Mut'im ibn Adi", "Abu Talib", "Al-Abbas", "Waraqah ibn Nawfal"], correct: 0 },
+                        { q: "Quem foi o último companheiro a falecer em Medina (considerado o último a morrer entre os que estavam com o Profeta)?", answers: ["Abu al-Tufayl Amir ibn Wathilah", "Anas ibn Malik", "Sahl ibn Sa'd", "Abdullah ibn Umar"], correct: 0 }
+                    ],
+                    l9: [
+                        { q: "Qual era o nome da filha do Profeta que se casou com Uthman ibn Affan?", answers: ["Ruqayyah", "Zainab", "Umm Kulthum", "Fatimah"], correct: 0 },
+                        { q: "Quem foi o companheiro que matou o poeta Abu 'Afak por ordem do Profeta?", answers: ["Salim ibn Umayr", "Amr ibn al-Jamuh", "Umayr ibn Adi", "Abdullah ibn Anis"], correct: 0 },
+                        { q: "Qual o nome da batalha em que os muçulmanos usaram pela primeira vez a artilharia (lançadores de pedras)?", answers: ["Ta'if", "Khaybar", "Hunayn", "Badr"], correct: 0 },
+                        { q: "Quantos muçulmanos participaram da expedição a Tabuk (a última liderada pelo Profeta)?", answers: ["30.000", "10.000", "3.000", "1.500"], correct: 0 },
+                        { q: "Qual o nome do governador do Iêmen que abraçou o Islam e liderou a tribo de Azd?", answers: ["Fayruz al-Daylami", "Al-Ash'ath ibn Qays", "Qays ibn Makshuh", "Farwah ibn Musayk"], correct: 0 },
+                        { q: "Quem foi o companheiro que relatou o maior número de hadiths (aproximadamente 5.300)?", answers: ["Abu Hurairah", "Abdullah ibn Umar", "Anas ibn Malik", "Aisha"], correct: 0 },
+                        { q: "Em que ano ocorreu a Batalha de Autas, que foi um desdobramento da Batalha de Hunayn?", answers: ["8 AH", "7 AH", "9 AH", "6 AH"], correct: 0 },
+                        { q: "Qual o nome do companheiro que foi apelidado de 'o monge desta ummah'?", answers: ["Abu Dhar al-Ghifari", "Salman al-Farisi", "Uthman ibn Maz'un", "Abdullah ibn Mas'ud"], correct: 0 },
+                        { q: "Quantos dos filhos do Profeta viveram até a idade adulta?", answers: ["4 (Zainab, Ruqayyah, Umm Kulthum, Fatimah)", "3", "2", "5"], correct: 0 },
+                        { q: "Qual o nome do governador de Meca durante a conquita, que depois se converteu ao Islam?", answers: ["Abu Sufyan ibn Harb", "Khalid ibn al-Walid", "Amr ibn al-As", "Ikrimah ibn Abi Jahl"], correct: 0 }
+                    ],
+                    l10: [
+                        { q: "Quem foi o líder da tribo de Thaqif que inicialmente resistiu e depois se converteu, tornando-se governador de Ta'if?", answers: ["Uthman ibn Abi al-As", "Al-Mughirah ibn Shu'bah", "Urwah ibn Mas'ud", "Abu Bakr al-Thaqafi"], correct: 0 },
+                        { q: "Qual o nome da batalha que ocorreu entre os muçulmanos e os judeus de Khaybar, onde o Profeta entregou a bandeira a Ali?", answers: ["Khaybar", "Nadr", "Qurayzah", "Fadak"], correct: 0 },
+                        { q: "Em que ano o Profeta adoeceu e faleceu?", answers: ["11 AH", "10 AH", "12 AH", "9 AH"], correct: 0 },
+                        { q: "Quem foi o companheiro que liderou a oração durante a doença final do Profeta?", answers: ["Abu Bakr", "Umar", "Ali", "Bilal"], correct: 0 },
+                        { q: "Qual o nome da esposa do Profeta que foi capturada em Khaybar e depois libertada e casada com ele?", answers: ["Safiyyah bint Huyayy", "Rayhanah bint Zayd", "Juwayriyah bint al-Harith", "Maymunah bint al-Harith"], correct: 0 },
+                        { q: "Quantas batalhas (ghazawat) o Profeta liderou pessoalmente?", answers: ["27 (aprox.)", "19", "22", "31"], correct: 0 },
+                        { q: "Qual o nome do companheiro que se destacou na Batalha de Yamamah (após o Profeta) e matou Musaylimah?", answers: ["Wahshi ibn Harb", "Zayd ibn al-Khattab", "Abu Dujana", "Al-Bara' ibn Malik"], correct: 0 },
+                        { q: "Qual era o nome do jumento do Profeta?", answers: ["Ya'foor", "Duldul", "Uthayb", "Al-Qaswa"], correct: 0 },
+                        { q: "Quem foi o companheiro conhecido como 'o porteiro do Paraíso'?", answers: ["Uthman ibn Affan", "Talhah ibn Ubaydullah", "Sa'd ibn Abi Waqqas", "Abd al-Rahman ibn Awf"], correct: 0 },
+                        { q: "Qual o nome do anjo que trouxe a primeira revelação ao Profeta?", answers: ["Jibril (Gabriel)", "Mikail (Miguel)", "Israfil", "Azrail"], correct: 0 }
+                    ]
+                }
+            },
+            // 5. HADITH
+            "cat5": {
+                title: "Hadith", icon: "💬",
+                levels: {
+                    l1: [
+                        { q: "O que é o Hadith?", answers: ["Palavras de Allah", "Ditos e acções do Profeta", "Histórias de Profetas antigos", "Leis criadas por sábios"], correct: 1 },
+                        { q: "Qual coleção de Hadith é considerada a mais autêntica?", answers: ["Sahih Muslim", "Sahih Al-Bukhari", "Sunan Abu Dawud", "Al-Muwatta"], correct: 1 },
+                        { q: "A Sunnah é baseada em quê?", answers: ["Apenas no Qur'an", "No Hadith", "Em costumes locais", "Em opiniões pessoais"], correct: 1 },
+                        { q: "Quem narrou o maior número de Hadiths?", answers: ["Abu Bakr", "Aisha (r.a.)", "Abu Hurairah (r.a.)", "Umar"], correct: 2 },
+                        { q: "O famoso hadith 'As acções são julgadas pelas intenções' é encontrado onde?", answers: ["Sahih Al-Bukhari 1", "No Qur'an", "Num livro de Fiqh", "É um ditado popular"], correct: 0 },
+                        // ... adicione mais 5 ...
+                        { q: "A Sunnah é a aplicação prática do Qur'an?", answers: ["Não", "Sim", "Parcialmente", "Não sei"], correct: 1 },
+                        { q: "A colecção 'Mishkat al-Masabih' é de Hadith?", answers: ["Sim", "Não", "É de Fiqh", "É de História"], correct: 0 },
+                        { q: "Quem é conhecido como 'O Narrador do Islam'?", answers: ["Ali (r.a.)", "Ibn Umar (r.a.)", "Abu Hurairah (r.a.)", "Ibn Abbas (r.a.)"], correct: 2 },
+                        { q: "As coleções autênticas são chamadas de 'Al-Kutub Al-Sittah' (Os Seis Livros)?", answers: ["Não, são sete", "Sim", "Não, são quatro", "Não"], correct: 1 },
+                        { q: "Para o Hadith ser Sahih (Autêntico), a cadeia de narradores deve ser ininterrupta?", answers: ["Não necessáriamente", "Sim", "Apenas se o narrador for famoso", "Não"], correct: 1 }
+                    ],
+                    l2:[
+                        { q: "O que significa 'Matn' no contexto do Hadith?", answers: ["O texto ou mensagem do Hadith", "A cadeia de transmissores", "O narrador do Hadith", "O livro onde foi escrito"], correct: 0 },
+                        { q: "O que é o 'Sanad' ou 'Isnad'?", answers: ["As palavras do Profeta", "A cadeia de narradores até chegar ao Profeta", "A aprovação do Alcorão", "O capítulo do livro de Hadith"], correct: 1 },
+                        { q: "Qual destes livros NÃO faz parte dos 'Kutub al-Sittah' (Os Seis Livros Autênticos)?", answers: ["Sunan Ibn Majah", "Sunan an-Nasa'i", "Musnad Ahmad", "Sunan at-Tirmidhi"], correct: 2 },
+                        { q: "Qual é considerado o segundo livro de Hadith mais autêntico, logo após o Sahih Al-Bukhari?", answers: ["Sunan Abu Dawud", "Al-Muwatta", "Sunan Ibn Majah", "Sahih Muslim"], correct: 3 },
+                        { q: "A 'Sunnah Qawliyyah' refere-se a quê?", answers: ["Às aprovações tácitas do Profeta", "Às ações e práticas do Profeta", "Aos ditos e palavras do Profeta", "Às características físicas do Profeta"], correct: 2 },
+                        { q: "A 'Sunnah Fi'liyyah' refere-se a quê?", answers: ["Ditos do Profeta", "Ações e práticas do Profeta", "Orações obrigatórias", "Opiniões dos Sahabah"], correct: 1 },
+                        { q: "Como se designa a aprovação tácita (quando o Profeta viu algo e não proibiu)?", answers: ["Sunnah Qawliyyah", "Sunnah Fi'liyyah", "Sunnah Sahih", "Sunnah Taqririyyah"], correct: 3 },
+                        { q: "Quem foi o compilador do famoso livro 'Al-Muwatta'?", answers: ["Imam Al-Bukhari", "Imam Abu Hanifa", "Imam Malik ibn Anas", "Imam Ash-Shafi'i"], correct: 2 },
+                        { q: "A qual categoria pertence o famoso livro 'Riyad as-Salihin' (Jardins dos Justos)?", answers: ["É um livro estrito de jurisprudência (Fiqh)", "É uma coleção geral focada em moral e ética", "É uma coleção apenas de Hadiths fracos", "É um livro focado na biografia dos narradores"], correct: 1 },
+                        { q: "Como se chama a pessoa que narra e transmite um Hadith?", answers: ["Rawi", "Mufti", "Hafiz", "Qadi"], correct: 0 }
+                    ],
+
+                    l3: [
+                        { q: "Qual companheiro (Sahabi) do Profeta era conhecido pela sua extrema devoção em seguir os seus passos literais?", answers: ["Ali ibn Abi Talib (r.a.)", "Uthman ibn Affan (r.a.)", "Abu Hurairah (r.a.)", "Abdullah ibn Umar (r.a.)"], correct: 3 },
+                        { q: "Qual dos Quatro Califas Bem Guiados narrou menos Hadiths devido ao seu falecimento precoce após o Profeta?", answers: ["Umar ibn al-Khattab", "Abu Bakr as-Siddiq", "Uthman ibn Affan", "Ali ibn Abi Talib"], correct: 1 },
+                        { q: "Quem era Abdullah ibn Abbas (r.a.) no contexto da narrativa de Hadiths?", answers: ["O primo do Profeta e um dos maiores exegetas", "O servo pessoal do Profeta", "O comandante do exército", "O escriba oficial do Alcorão"], correct: 0 },
+                        { q: "Quem é o autor da enorme coleção 'Musnad' que contém mais de 27.000 Hadiths?", answers: ["Imam Al-Bukhari", "Imam Ash-Shafi'i", "Imam Malik", "Imam Ahmad bin Hanbal"], correct: 3 },
+                        { q: "Qual esposa do Profeta narrou mais de 2.000 Hadiths e era uma grande erudita?", answers: ["Khadijah (r.a.)", "Hafsa (r.a.)", "Aisha (r.a.)", "Zaynab (r.a.)"], correct: 2 },
+                        { q: "Quantos anos estima-se que Abu Hurairah (r.a.) passou em companhia próxima do Profeta para aprender tantos Hadiths?", answers: ["Cerca de 10 anos", "Cerca de 3 anos", "Cerca de 20 anos", "Apenas 1 ano"], correct: 1 },
+                        { q: "Como os Sahabah garantiam inicialmente a preservação do Hadith antes das grandes compilações em livro?", answers: ["Gravando em pedras", "Guardando em bibliotecas", "Através da memorização e prática diária", "Escrevendo papiros de ouro"], correct: 2 },
+                        { q: "Quem proibiu inicialmente a escrita de Hadiths no início da revelação?", answers: ["Abu Bakr", "Umar", "O Anjo Jibril", "O próprio Profeta, para evitar mistura com o Alcorão"], correct: 3 },
+                        { q: "Quem foi o servo do Profeta que narrou muitos Hadiths sobre o seu comportamento íntimo e diário?", answers: ["Anas bin Malik (r.a.)", "Bilal ibn Rabah (r.a.)", "Zaid bin Harithah (r.a.)", "Salman al-Farsi (r.a.)"], correct: 0 },
+                        { q: "Qual destes Companheiros narrou o célebre Hadith sobre a construção de mesquitas?", answers: ["Ali ibn Abi Talib", "Uthman ibn Affan", "Abu Bakr", "Talha ibn Ubaidullah"], correct: 1 }
+                    ],
+
+                    l4: [
+                        { q: "O que significa um Hadith ser classificado como 'Da'if'?", answers: ["Fabricado", "Autêntico", "Bom", "Fraco"], correct: 3 },
+                        { q: "Qual é a classificação de um Hadith que foi comprovadamente fabricado ou mentido?", answers: ["Gharib", "Mawdu'", "Mursal", "Hasan"], correct: 1 },
+                        { q: "O que define um Hadith 'Hasan'?", answers: ["É forte e aceitável, mas ligeiramente inferior ao Sahih", "É inaceitável para qualquer prática", "É um Hadith narrado apenas por uma pessoa", "É o nível mais elevado de autenticidade"], correct: 0 },
+                        { q: "Em que área os eruditos islâmicos são mais tolerantes quanto à citação de Hadiths Da'if (fracos)?", answers: ["Em leis criminais", "Em assuntos de crença (Aqidah)", "Para encorajar virtudes e boas ações", "Em regras de herança"], correct: 2 },
+                        { q: "Se um Hadith tem uma cadeia ininterrupta e narradores de memória e caráter impecáveis, ele é:", answers: ["Mawdu'", "Sahih", "Hasan", "Da'if"], correct: 1 },
+                        { q: "O que geralmente torna um Hadith 'Mawdu'' (fabricado)?", answers: ["O narrador tem memória fraca", "O texto é muito curto", "A presença de um mentiroso conhecido na cadeia", "A falta de um narrador no início"], correct: 2 },
+                        { q: "Pode-se basear um pilar fundamental da fé islâmica (Aqidah) num Hadith Da'if?", answers: ["Sim, sempre", "Sim, se for narrado por um Sahabi", "Não, nunca", "Apenas se for muito famoso"], correct: 2 },
+                        { q: "O que é um 'Hadith Qudsi'?", answers: ["Palavras e significados revelados por Allah, mas narrados pelas palavras do Profeta", "Um versículo do Alcorão esquecido", "Um Hadith narrado pelos anjos", "Um Hadith sobre Jerusalém (Al-Quds)"], correct: 0 },
+                        { q: "Como os eruditos de Fiqh tratam os Hadiths classificados como 'Hasan'?", answers: ["Rejeitam-nos totalmente", "Têm dúvidas sobre eles", "Não são permitidos em tribunal", "São aceites como prova válida na lei islâmica"], correct: 3 },
+                        { q: "O que significa a expressão 'Muttafaq 'Alayh' na ciência do Hadith?", answers: ["Acordado pelos Sahabah", "Acordado pelos quatro Imames de Fiqh", "Acordado por Al-Bukhari e Muslim", "Que o narrador é de confiança"], correct: 2 }
+                    ],
+
+                    l5:[
+                        { q: "Qual era o verdadeiro nome do Imam Al-Bukhari?", answers: ["Ahmad ibn Hanbal", "Muhammad ibn Ismail", "Malik ibn Anas", "Muslim ibn al-Hajjaj"], correct: 1 },
+                        { q: "Aproximadamente quantos Hadiths (sem repetições) o Imam Muslim incluiu no seu Sahih?", answers: ["Cerca de 1.000", "Cerca de 10.000", "Cerca de 4.000", "Cerca de 7.000"], correct: 2 },
+                        { q: "De onde era natural o Imam Al-Bukhari?", answers: ["Meca", "Medina", "Bagdade", "Bukhara (no atual Uzbequistão)"], correct: 3 },
+                        { q: "Qual compilador escreveu o 'Sunan Abu Dawud'?", answers: ["Sulayman ibn al-Ash'ath", "Muhammad ibn Isa", "Ahmad ibn Shu'ayb", "Muhammad ibn Yazid"], correct: 0 },
+                        { q: "Qual destes compiladores foi aluno e aprendeu diretamente com o Imam Al-Bukhari?", answers: ["Imam Malik", "Imam Muslim", "Imam Abu Hanifa", "Imam Ash-Shafi'i"], correct: 1 },
+                        { q: "O Imam An-Nasa'i é autor de qual destas famosas coleções?", answers: ["Sahih an-Nasa'i", "Musnad an-Nasa'i", "Sunan an-Nasa'i", "Muwatta an-Nasa'i"], correct: 2 },
+                        { q: "Qual Imam era conhecido por ter memorizado cerca de um milhão de Hadiths (incluindo as diferentes cadeias)?", answers: ["Imam Al-Bukhari", "Imam Malik", "Imam Muslim", "Imam Ahmad ibn Hanbal"], correct: 3 },
+                        { q: "Qual era a prática rigorosa do Imam Al-Bukhari antes de escrever qualquer Hadith na sua coleção Sahih?", answers: ["Jejuar durante um dia", "Fazer o Ghusl e rezar duas Rak'ats pedindo orientação", "Viajar para a cidade do narrador", "Ler o Alcorão inteiro"], correct: 1 },
+                        { q: "Qual livro dos 'Kutub al-Sittah' destaca-se por classificar o grau de cada Hadith logo após citá-lo?", answers: ["Sunan at-Tirmidhi", "Sahih Al-Bukhari", "Sunan Ibn Majah", "Sunan an-Nasa'i"], correct: 0 },
+                        { q: "Qual é a ordem cronológica correta de vida destes grandes Imames?", answers: ["Bukhari, Muslim, Malik, Shafi'i", "Shafi'i, Ahmad, Bukhari, Malik", "Malik, Shafi'i, Ahmad, Bukhari", "Ahmad, Malik, Bukhari, Shafi'i"], correct: 2 }
+                    ],
+
+                    l6:[
+                        { q: "O que é um Hadith 'Mutawatir'?", answers: ["Narrado apenas pelos Califas", "Narrado por um grupo tão grande que seria impossível concordarem numa mentira", "Um Hadith fraco mas popular", "Um Hadith que foi cancelado"], correct: 1 },
+                        { q: "O que é um Hadith 'Ahad'?", answers: ["Um Hadith fabricado", "Um Hadith do dia de Domingo", "Narrado por um número limitado, não atingindo o grau Mutawatir", "O nível mais alto de Hadith"], correct: 2 },
+                        { q: "Quantas categorias principais de Hadith 'Ahad' existem, baseadas no número de narradores?", answers: ["Três (Mashhur, Aziz, Gharib)", "Duas (Sahih e Da'if)", "Quatro (Sahih, Hasan, Da'if, Mawdu')", "Cinco"], correct: 0 },
+                        { q: "O que define um Hadith 'Mashhur' (Famoso)?", answers: ["Narrado por uma só pessoa", "Tem três ou mais narradores em cada nível, mas não chega a Mutawatir", "É conhecido por toda a humanidade", "Passa na televisão"], correct: 1 },
+                        { q: "O que é um Hadith 'Gharib' (Estranho/Singular)?", answers: ["Tem texto incompreensível", "Vem de fora do mundo islâmico", "É rejeitado por ser ilógico", "Tem apenas um narrador em algum nível da cadeia de transmissão"], correct: 3 },
+                        { q: "O que caracteriza um Hadith 'Aziz'?", answers: ["Tem no mínimo dois narradores em cada nível da cadeia", "Foi narrado por reis", "É muito querido pelo Profeta", "Não pode ser contrariado"], correct: 0 },
+                        { q: "Em termos de transmissão, o texto do Alcorão é classificado como:", answers: ["Ahad", "Gharib", "Mutawatir", "Mashhur"], correct: 2 },
+                        { q: "A grande maioria dos Hadiths Sahih (autênticos) que seguimos no dia a dia pertencem a que categoria de transmissão?", answers: ["Mawdu'", "Ahad", "Mutawatir", "Da'if"], correct: 1 },
+                        { q: "Se houver uma contradição aparente, qual tipo de narração tem precedência absoluta?", answers: ["Ahad", "Mashhur", "Gharib", "Mutawatir"], correct: 3 },
+                        { q: "O célebre Hadith 'As ações são julgadas pelas intenções', na sua primeira geração (de Umar), é classificado como:", answers: ["Gharib", "Mutawatir", "Aziz", "Mashhur"], correct: 0 }
+                    ],
+
+                    l7:[
+                        { q: "Qual Hadith é frequentemente chamado de 'Umm as-Sunnah' (A Mãe da Sunnah)?", answers: ["O Hadith sobre as intenções", "O Hadith de Jibril", "O Hadith da migração (Hijrah)", "O Hadith sobre o bom caráter"], correct: 1 },
+                        { q: "No Hadith de Jibril, quais são os três níveis essenciais de religião abordados?", answers: ["Islam, Iman, Ihsan", "Oração, Jejum, Zakat", "Passado, Presente, Futuro", "Corpo, Mente, Alma"], correct: 0 },
+                        { q: "De acordo com o Hadith, qual é a definição de 'Ihsan' (Excelência)?", answers: ["Dar muita caridade", "Rezar à noite", "Adorar a Allah como se O visses, pois se não O vês, Ele te vê", "Fazer o Hajj todos os anos"], correct: 2 },
+                        { q: "Complete o famoso Hadith: 'Deixem aquilo que vos causa dúvidas por...'", answers: ["Aquilo que é mais fácil", "Aquilo que não vos causa dúvidas", "Aquilo que os eruditos mandam", "Aquilo que os vossos pais faziam"], correct: 1 },
+                        { q: "Segundo o Hadith, 'A religião é...' o quê?", answers: ["Nasihah (Conselho sincero)", "Dificuldade", "Ritual", "Isolamento"], correct: 0 },
+                        { q: "Num Hadith famoso, quando questionado sobre qual a ação mais amada por Allah, o Profeta respondeu:", answers: ["Dar esmola aos pobres", "Participar na guerra", "A oração realizada no seu tempo correto", "Cuidar dos órfãos"], correct: 2 },
+                        { q: "Complete o Hadith do Profeta: 'Quem nos engana...'", answers: ["Será perdoado", "Não é dos nossos (da nossa comunidade)", "Deve pagar uma multa", "Não entra na mesquita"], correct: 1 },
+                        { q: "Qual é a recompensa prometida em Hadith para quem constrói uma mesquita por amor a Allah?", answers: ["Riqueza no mundo", "Vitória nas batalhas", "A paz interior eterna", "Allah constrói-lhe uma casa no Paraíso"], correct: 3 },
+                        { q: "Segundo o Profeta, 'O homem forte não é o bom lutador, mas sim aquele que...'", answers: ["Controla-se a si mesmo na hora da raiva", "Levanta muito peso", "Vence todos os debates", "Nunca chora"], correct: 0 },
+                        { q: "O que disse o Profeta (s.a.w) no seu Sermão de Despedida sobre a superioridade racial?", answers: ["Os árabes são superiores", "Nenhum árabe é superior a um não-árabe exceto pela piedade (Taqwa)", "Todas as raças devem viver separadas", "A superioridade vem da riqueza"], correct: 1 }
+                    ],
+
+                    l8:[
+                        { q: "O que é 'Ilm al-Rijal' nas ciências do Hadith?", answers: ["A ciência da gramática árabe", "O estudo do texto do Alcorão", "O conhecimento e biografias dos narradores (homens e mulheres)", "O estudo de heranças"], correct: 2 },
+                        { q: "O que significa a ciência de 'Jarh wa Ta'dil'?", answers: ["A ciência da astronomia islâmica", "A ciência de criticar (apontar falhas) e elogiar (validar) os narradores", "A ciência das regras de recitação", "O estudo dos milagres dos profetas"], correct: 1 },
+                        { q: "Na ciência do Hadith, o termo 'Jarh' refere-se a quê?", answers: ["Declarar um narrador de confiança", "Escrever o Hadith num livro", "Memorizar rapidamente", "Criticar ou apontar falhas na memória ou caráter de um narrador"], correct: 3 },
+                        { q: "O que significa 'Ta'dil'?", answers: ["Declarar que um narrador é fiável, justo e aceitável", "Apagar um Hadith fraco", "Mudar o texto do Hadith", "Traduzir o Hadith"], correct: 0 },
+                        { q: "O que é a condição de ''Adalah' (Justiça/Integridade) exigida num narrador?", answers: ["Ser de uma família rica", "Ser muçulmano, adulto, são, e evitar grandes pecados e más condutas", "Ser fluente em várias línguas", "Nunca ter saído da sua cidade natal"], correct: 1 },
+                        { q: "O que significa ''Dabt' (Precisão/Retenção) num narrador de Hadith?", answers: ["Saber lutar com espada", "Falar muito alto", "Ter excelente memória ou precisão rigorosa nos seus registos escritos", "Ter lido muitos livros"], correct: 2 },
+                        { q: "Qual destas NÃO é uma condição válida para avaliar a credibilidade de um transmissor de Hadith?", answers: ["A sua memória", "A sua origem étnica ou ser árabe", "A sua honestidade e religiosidade", "O seu encontro provado com o mestre"], correct: 1 },
+                        { q: "Se um narrador é apanhado a mentir em conversas mundanas normais, como os estudiosos tratam o seu Hadith?", answers: ["Aceitam se for sobre virtudes", "Ignoram a mentira mundana", "O seu Hadith é totalmente rejeitado (Matruk)", "Pedem-lhe para jurar pelo Alcorão"], correct: 2 },
+                        { q: "A coleção 'Asma ar-Rijal' contém o quê?", answers: ["Nomes e regras de Fiqh", "Nomes de anjos", "As promessas de Allah", "Os nomes, datas e biografias detalhadas dos transmissores"], correct: 3 },
+                        { q: "Quem foi um dos pioneiros mais temidos e respeitados na ciência de 'Jarh wa Ta'dil' no início da história do Islam?", answers: ["Yahya ibn Ma'in", "Abu Hanifa", "Hasan al-Basri", "Khalid ibn al-Walid"], correct: 0 }
+                    ],
+
+                    l9: [
+                        { q: "O que é um Hadith 'Munqati''?", answers: ["Aquele que tem um texto muito longo", "Aquele que tem um ou mais narradores em falta, não consecutivos, na cadeia", "Aquele que foi revelado em Meca", "Aquele que o Profeta não disse mas fez"], correct: 1 },
+                        { q: "O que é um Hadith 'Mursal'?", answers: ["Quando a cadeia está perfeita", "Quando um narrador mente abertamente", "Quando o Imam Muslim rejeita a narração", "Quando um Tabi'i (sucessor) narra diretamente do Profeta, omitindo o Sahabi"], correct: 3 },
+                        { q: "O que caracteriza um Hadith 'Mu'dal'?", answers: ["Faltam dois ou mais narradores consecutivos na cadeia de transmissão", "É recitado em voz alta", "Tem palavras estrangeiras", "Foi revogado por outro Hadith"], correct: 0 },
+                        { q: "O que é um Hadith 'Mu'allaq' (Suspenso)?", answers: ["O texto está incompleto no final", "O narrador chora ao contar", "Quando o início da cadeia (do lado do compilador) é omitido", "Quando o Hadith ainda não foi classificado"], correct: 2 },
+                        { q: "O que significa um Hadith ser classificado como 'Shadh' (Irregular)?", answers: ["Não tem vogais no texto árabe", "Quando um narrador fiável contradiz a narração de pessoas ainda mais fiáveis", "Quando um narrador fraco narra algo novo", "Quando fala sobre o fim do mundo"], correct: 1 },
+                        { q: "O que é um Hadith 'Munkar' (Rejeitado/Denunciado)?", answers: ["Foi proibido pelos califas", "Fala sobre magia", "Acontece durante o sono do narrador", "Quando um narrador fraco contradiz narradores que são de confiança"], correct: 3 },
+                        { q: "Na ciência do Hadith, o que é uma ''Illah'?", answers: ["Um defeito oculto e subtil que prejudica a autenticidade do Hadith, só detetável por mestres", "Uma doença física que o narrador sofreu", "Uma regra de pontuação", "Uma luz espiritual do texto"], correct: 0 },
+                        { q: "O que é um Hadith 'Mudtarib' (Confuso/Instável)?", answers: ["Aquele que assusta quem o lê", "Aquele que foi narrado em várias formas contraditórias e não há como decidir qual a correta", "Aquele que o narrador esqueceu no dia seguinte", "Aquele que ofende alguém"], correct: 1 },
+                        { q: "O que é um Hadith 'Maqlub'?", answers: ["Um Hadith cujo texto ou narradores da cadeia foram invertidos ou trocados acidentalmente", "Um Hadith que foi traduzido para outra língua", "Um Hadith lido do fim para o princípio", "Um Hadith recitado em oração"], correct: 0 },
+                        { q: "O que é um Hadith 'Mudarraj' (Intercalado)?", answers: ["Um Hadith ensinado em degraus da mesquita", "Um Hadith que aborda matemática", "Quando as palavras explicativas do próprio narrador se misturam com as do Profeta por engano", "Quando a tinta do livro borrou"], correct: 2 }
+                    ],
+
+                    l10: [
+                        { q: "O que significa o termo 'Tadlis' nas ciências do Hadith?", answers: ["Roubar um livro de Hadith", "Quando um narrador oculta intencionalmente defeitos ou o nome do mestre de quem ouviu diretamente", "Memorizar Hadiths rapidamente", "Ler sem purificação (Wudu)"], correct: 1 },
+                        { q: "Como é chamado o narrador que comete 'Tadlis'?", answers: ["Mudallis", "Munafiq", "Kafir", "Zindiq"], correct: 0 },
+                        { q: "Qual era a condição rigorosíssima estabelecida pelo Imam Al-Bukhari para aceitar narradores contemporâneos na mesma cadeia?", answers: ["Viverem na mesma rua", "Terem nascido no mesmo ano", "Haver prova de que se encontraram fisicamente pelo menos uma vez", "Gostarem um do outro"], correct: 2 },
+                        { q: "O Imam Muslim exigia a mesma condição que Al-Bukhari quanto ao encontro físico dos contemporâneos?", answers: ["Sim, era ainda mais rigoroso", "Não, para Muslim a simples possibilidade de encontro (viverem no mesmo tempo e local acessível) era suficiente", "Não, o Imam Muslim não ligava a cadeias", "Sim, exigiam exatamente o mesmo"], correct: 1 },
+                        { q: "O que designa um narrador 'Mukhadram'?", answers: ["Alguém que não sabia ler nem escrever", "Alguém que viveu muito tempo", "Alguém que falsificava as cadeias por dinheiro", "Alguém que viveu na era da Jahiliyyah e no Islam, mas não chegou a ver o Profeta pessoalmente"], correct: 3 },
+                        { q: "O que é o livro 'Al-Mustadrak' do Imam Al-Hakim?", answers: ["Uma coleção de Hadiths que cumprem as rigorosas condições de Bukhari e/ou Muslim, mas não foram incluídos por eles", "Um livro de poesia árabe", "Uma refutação do Sahih Al-Bukhari", "O primeiro livro da história a criticar Hadiths"], correct: 0 },
+                        { q: "Qual é a principal característica de uma compilação tipo 'Sunan' (ex: Sunan Abu Dawud)?", answers: ["Estão organizados por ordem alfabética", "Estão organizados pelos capítulos de jurisprudência (Fiqh) para facilitar a prática da lei", "Contêm apenas os Hadiths mais longos", "Estão ordenados por califas"], correct: 1 },
+                        { q: "Qual é a característica de uma compilação tipo 'Musnad' (ex: Musnad Ahmad)?", answers: ["Organizado por tribos", "Organizado pelas cidades onde ocorreram", "Organizado pelos nomes dos Sahabah que narraram os Hadiths, independentemente do tema", "Organizado pelo tamanho do Hadith"], correct: 2 },
+                        { q: "Qual compilação de Hadith é chamada de 'Jami''?", answers: ["Um livro pequeno para bolso", "Um livro focado apenas em oração", "Um livro proibido pelos eruditos", "Um livro que abrange todos os grandes temas da religião (Aqidah, Fiqh, Tafsir, etc.)"], correct: 3 },
+                        { q: "Quem escreveu a famosa 'Muqaddimah' (Introdução), que é um dos livros mais importantes que sistematizou as Ciências do Hadith (Mustalah al-Hadith)?", answers: ["Ibn al-Salah", "Ibn Taymiyyah", "Imam Ghazali", "Ibn Khaldun"], correct: 0 }
+                    ],
+
+
+                }
+            }
+        };
+
+        // Variaveis de Estado do Jogo
+        let gameState = {
+            userProgress: {}, // Carregado do LocalStorage
+            currentCategoryId: null,
+            currentLevelId: null,
+            currentQuestionIndex: 0,
+            currentQuestionsArr: [],
+            score: 0,
+            lives: 3,
+            timer: null,
+            timeLeft: 30,
+            soundEnabled: true
+        };
+
+        // Configurações do Sistema
+        const POINTS_PER_CORRECT = 10;
+        const PASS_SCORE = 60; // 6/10 perguntas
+        const TOTAL_LEVELS_PER_CAT = 10; // Definido no esboço
+        const TIME_PER_QUESTION = 30;
+
+        // Elementos HTML D.O.M.
+        const screens = document.querySelectorAll('.screen');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const settingsSound = document.getElementById('setting-sound');
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = function () {
+            loadProgress();
+            renderCategories();
+            setupSettings();
+        };
+
+        // --- NAVEGAÇÃO ---
+        function navigateTo(screenId) {
+            screens.forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            // Logica específica ao abrir certas telas
+            if (screenId === 'screen-categories') renderCategories();
+            if (screenId === 'screen-home') stopQuizIntervals();
+        }
+
+        // --- GESTÃO DE PROGRESSO (Offline com LocalStorage) ---
+        function loadProgress() {
+            const saved = localStorage.getItem('islamic_quiz_prog');
+            if (saved) {
+                gameState.userProgress = JSON.parse(saved);
+            } else {
+                // Inicializar estrutura vazia
+                gameState.userProgress = {};
+                Object.keys(quizDatabase).forEach(catId => {
+                    gameState.userProgress[catId] = {
+                        unlockedLevels: 1, // Apenas Nível 1 aberto
+                        scores: {} // l1: 80, l2: 90 etc
+                    };
+                });
+                saveProgress();
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('islamic_quiz_prog', JSON.stringify(gameState.userProgress));
+        }
+
+        function resetProgress() {
+            if (confirm("Tem certeza que deseja apagar todo o seu progresso? Isto não pode ser desfeito.")) {
+                localStorage.removeItem('islamic_quiz_prog');
+                loadProgress();
+                navigateTo('screen-home');
+                alert("Progresso resetado.");
+            }
+        }
+
+        // --- RENDERIZAR CATEGORIAS ---
+        function renderCategories() {
+            const container = document.getElementById('category-list-container');
+            container.innerHTML = '';
+
+            Object.keys(quizDatabase).forEach(catId => {
+                const cat = quizDatabase[catId];
+                const prog = gameState.userProgress[catId];
+
+                // Calcular progresso total (%) baseado em níveis concluidos (ter score)
+                const completedCount = Object.keys(prog.scores).length;
+                const perc = Math.round((completedCount / TOTAL_LEVELS_PER_CAT) * 100);
+
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.onclick = () => selectCategory(catId);
+                card.innerHTML = `
+            <div style="display:flex; align-items:center">
+                <div class="cat-icon">${cat.icon}</div>
+                <div class="cat-info">
+                    <h3>${cat.title}</h3>
+                    <p>${perc}% Completo (${prog.unlockedLevels}/${TOTAL_LEVELS_PER_CAT} Níveis)</p>
+                </div>
+            </div>
+            <div class="progress-circle">${perc}%</div>
+        `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- RENDERIZAR NÍVEIS ---
+        function selectCategory(catId) {
+            gameState.currentCategoryId = catId;
+            document.getElementById('levels-title').innerText = quizDatabase[catId].title;
+            renderLevelGrid();
+            navigateTo('screen-levels');
+        }
+
+        function renderLevelGrid() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = '';
+            const catProg = gameState.userProgress[gameState.currentCategoryId];
+            const unlocked = catProg.unlockedLevels;
+
+            for (let i = 1; i <= TOTAL_LEVELS_PER_CAT; i++) {
+                const levelKey = 'l' + i;
+                const score = catProg.scores[levelKey];
+                const item = document.createElement('div');
+                item.className = 'level-item';
+
+                let difficulty = i <= 3 ? "Fácil" : (i <= 7 ? "Média" : "Difícil");
+
+                if (i < unlocked) {
+                    // ✅ Completo
+                    item.classList.add('completed');
+                    item.innerHTML = `
+                <div class="level-number">${i}</div>
+                <div class="level-status">✅</div>
+                ${score ? `<div class="score-badge">${score}/100</div>` : ''}
+            `;
+                    item.onclick = () => startQuiz(levelKey);
+                } else if (i === unlocked) {
+                    // ▶️ Jogar (Atual)
+                    item.classList.add('active-level');
+                    item.innerHTML = `
+                <div class="level-number">${i}</div>
+                <div class="level-status">▶️ Jogar</div>
+                <div class="score-badge" style="color:#e67e22">${difficulty}</div>
+            `;
+                    item.onclick = () => startQuiz(levelKey);
+                } else {
+                    // 🔒 Bloqueado
+                    item.classList.add('locked');
+                    item.innerHTML = `
+                <div class="level-number">${i}</div>
+                <div class="level-status">🔒</div>
+            `;
+                    // Sem onclick
+                }
+                grid.appendChild(item);
+            }
+        }
+
+        // --- LÓGICA DO QUIZ (JOGO) ---
+        function startQuiz(levelId) {
+            // Verificar se existem perguntas para este nível no esboço
+            const questions = quizDatabase[gameState.currentCategoryId].levels[levelId];
+            if (!questions || questions.length === 0) {
+                alert("Este nível ainda não tem perguntas implementadas neste esboço. Adicione-as na 'quizDatabase' no código.");
+                return;
+            }
+
+            gameState.currentLevelId = levelId;
+            // Clonar e embaralhar perguntas (opcional, mas bom)
+            gameState.currentQuestionsArr = shuffleArray([...questions]).slice(0, 10);
+
+            // Reiniciar estados
+            gameState.currentQuestionIndex = 0;
+            gameState.score = 0;
+            gameState.lives = 3;
+
+            updateLivesUI();
+            navigateTo('screen-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            stopQuizIntervals();
+            if (gameState.currentQuestionIndex >= gameState.currentQuestionsArr.length) {
+                finishLevel();
+                return;
+            }
+
+            const qData = gameState.currentQuestionsArr[gameState.currentQuestionIndex];
+
+            // Atualizar UI
+            document.getElementById('question-counter-label').innerText = `Perg. ${gameState.currentQuestionIndex + 1}/10`;
+            document.getElementById('question-text').innerText = qData.q;
+
+            const optButtons = document.querySelectorAll('.option-btn');
+            optButtons.forEach((btn, index) => {
+                btn.className = 'option-btn'; // resetar cores
+                btn.querySelector('.option-txt').innerText = qData.answers[index];
+            });
+
+            startTimer();
+        }
+
+        function checkAnswer(selectedIndex) {
+            stopTimer();
+            const qData = gameState.currentQuestionsArr[gameState.currentQuestionIndex];
+            const correctIndex = qData.correct;
+            const optButtons = document.querySelectorAll('.option-btn');
+
+            // Bloquear outros cliques
+            optButtons.forEach(btn => btn.classList.add('disabled'));
+
+            if (selectedIndex === correctIndex) {
+                // ✅ Certo
+                optButtons[selectedIndex].classList.add('correct');
+                gameState.score += POINTS_PER_CORRECT;
+                playSound('correct');
+                showFeedback('✅');
+            } else {
+                // ❌ Errado
+                if (selectedIndex !== null) optButtons[selectedIndex].classList.add('wrong');
+                optButtons[correctIndex].classList.add('correct'); // Mostrar a certa
+                gameState.lives--;
+                updateLivesUI();
+                playSound('wrong');
+                showFeedback('❌');
+            }
+
+            // Esperar 1.5s antes da próxima ou Game Over
+            setTimeout(() => {
+                if (gameState.lives <= 0) {
+                    gameOver();
+                } else {
+                    gameState.currentQuestionIndex++;
+                    loadQuestion();
+                }
+            }, 1500);
+        }
+
+        // --- SISTEMA DE VIDAS ❤️ ---
+        function updateLivesUI() {
+            let hearts = "";
+            for (let i = 0; i < 3; i++) {
+                hearts += (i < gameState.lives) ? "❤️" : "🖤";
+            }
+            document.getElementById('lives-container').innerText = hearts;
+        }
+
+        // --- TEMPORIZADOR ⏱️ ---
+        function startTimer() {
+            gameState.timeLeft = TIME_PER_QUESTION;
+            updateTimerUI();
+
+            // Intervalo de 1 segundo
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerUI();
+
+                if (gameState.timeLeft <= 0) {
+                    stopTimer();
+                    // Tempo acabou = resposta errada
+                    checkAnswer(null);
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const text = document.getElementById('timer-text');
+            const bar = document.getElementById('timer-bar-fill');
+            text.innerText = gameState.timeLeft;
+
+            // Calcular porcentagem da barra
+            const perc = (gameState.timeLeft / TIME_PER_QUESTION) * 100;
+            bar.style.width = perc + '%';
+
+            // Mudar cor se tempo acabando
+            if (gameState.timeLeft <= 5) {
+                bar.style.backgroundColor = 'var(--wrong-color)';
+                text.style.color = 'var(--wrong-color)';
+            } else {
+                bar.style.backgroundColor = 'var(--primary-color)';
+                text.style.color = 'var(--primary-color)';
+            }
+        }
+
+        function stopQuizIntervals() {
+            clearInterval(gameState.timer);
+        }
+        function stopTimer() { stopQuizIntervals(); }
+
+
+        // --- FIM DE JOGO / NÍVEL ---
+        function finishLevel() {
+            navigateTo('screen-result');
+            const title = document.getElementById('result-title');
+            const scoreVal = document.getElementById('result-score-text');
+            const msg = document.getElementById('result-status-msg');
+            const icon = document.getElementById('result-icon');
+            const btnNext = document.getElementById('btn-next-level');
+
+            scoreVal.innerHTML = `Pontuação: <b>${gameState.score}</b> / 100`;
+
+            if (gameState.score >= PASS_SCORE) {
+                // 🏆 PASSOU
+                icon.innerText = "🎉";
+                icon.className = "success-icon";
+                title.innerText = "Nível Concluído!";
+                msg.innerText = `Parabéns! Obtiveste conhecimento suficiente.`;
+                btnNext.innerText = "Seguinte ▶️";
+                btnNext.classList.remove('btn-accent');
+
+                // Atualizar progresso se for o nível atual
+                const currentLvlNum = parseInt(gameState.currentLevelId.substring(1));
+                const catProg = gameState.userProgress[gameState.currentCategoryId];
+
+                // Guardar melhor pontuação
+                if (!catProg.scores[gameState.currentLevelId] || gameState.score > catProg.scores[gameState.currentLevelId]) {
+                    catProg.scores[gameState.currentLevelId] = gameState.score;
+                }
+
+                // Desbloquear próximo se este era o último desbloqueado
+                if (currentLvlNum === catProg.unlockedLevels && currentLvlNum < TOTAL_LEVELS_PER_CAT) {
+                    catProg.unlockedLevels = currentLvlNum + 1;
+                }
+                saveProgress();
+            } else {
+                // 😢 FALHOU (Não atingiu pontuação mínima)
+                icon.innerText = "📖";
+                icon.className = "fail-icon";
+                title.innerText = "Tenta Novamente";
+                msg.innerText = `Precisas de pelo menos ${PASS_SCORE} pontos para passar. Continua a estudar!`;
+                btnNext.innerText = "Repetir 🔄";
+                btnNext.classList.add('btn-accent');
+            }
+        }
+
+        function gameOver() {
+            stopQuizIntervals();
+            navigateTo('screen-result');
+            const icon = document.getElementById('result-icon');
+            icon.innerText = "❌";
+            icon.className = "fail-icon";
+            document.getElementById('result-title').innerText = "Game Over";
+            document.getElementById('result-score-text').innerHTML = `Esgotaste as tuas vidas ❤️.<br>Pontuação: <b>${gameState.score}</b>`;
+            document.getElementById('result-status-msg').innerText = "Revisa o conteúdo e tenta novamente o nível.";
+            const btnNext = document.getElementById('btn-next-level');
+            btnNext.innerText = "Repetir Nível 🔄";
+            btnNext.classList.add('btn-accent');
+        }
+
+        // Logica do botão principal da tela de resultados
+        function retryOrNextLevel() {
+            const isSuccess = gameState.score >= PASS_SCORE && gameState.lives > 0;
+            const currentLvlNum = parseInt(gameState.currentLevelId.substring(1));
+
+            if (isSuccess && currentLvlNum < TOTAL_LEVELS_PER_CAT) {
+                // Ir para o próximo
+                startQuiz('l' + (currentLvlNum + 1));
+            } else {
+                // Repetir o mesmo
+                startQuiz(gameState.currentLevelId);
+            }
+        }
+
+        // --- DEFINIÇÕES E SOM ---
+        function setupSettings() {
+            // Carregar definição de som
+            const s = localStorage.getItem('islamic_quiz_sound');
+            gameState.soundEnabled = (s === null) ? true : (s === 'true');
+            settingsSound.checked = gameState.soundEnabled;
+
+            settingsSound.addEventListener('change', function () {
+                gameState.soundEnabled = this.checked;
+                localStorage.setItem('islamic_quiz_sound', this.checked);
+            });
+        }
+
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+
+            // Usando Audio Context Web para gerar sons simples sem precisar de ficheiros .mp3 (Ótimo para offline/leve)
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Nota La
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                } else {
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // Grave
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                    // Vibração leve se suportado
+                    if (navigator.vibrate) navigator.vibrate(200);
+                }
+            } catch (e) { console.log("Áudio não suportado"); }
+        }
+
+        function showFeedback(icon) {
+            feedbackOverlay.innerText = icon;
+            feedbackOverlay.style.display = 'flex';
+            feedbackOverlay.style.animation = 'popIn 1s ease forwards';
+            setTimeout(() => {
+                feedbackOverlay.style.display = 'none';
+                feedbackOverlay.style.animation = '';
+            }, 1000);
+        }
+
+        // --- UTILITÁRIOS ---
+        // Embaralhar Array (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[array.length - 1]] = [array[array.length - 1], array[i]]; // Corrigido bug de sintaxe aqui
+            }
+            return array;
+        }
+        // Correção rápida da função shuffle acima que tinha erro de sintaxe
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+    </script>
+
+</body>
+
+</html>
